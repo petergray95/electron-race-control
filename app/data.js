@@ -15,8 +15,8 @@ class DataSession {
     this.client.start();
   }
 
-  addMessage(a, message) {
-    console.log(this.client, a, message);
+  addMessage(self, message) {
+    console.log(this.client, self, message);
   }
 }
 

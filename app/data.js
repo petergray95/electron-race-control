@@ -1,6 +1,16 @@
+import { F1TelemetryClient, constants } from 'f1-telemetry-client';
+
+const { PACKETS } = constants;
+
 class DataSession {
   constructor() {
-    this.client = null;
+    this.client = new F1TelemetryClient();
+
+    this.client.on(PACKETS.carTelemetry, console.log);
+  }
+
+  run() {
+    this.client.start();
   }
 }
 

@@ -13,4 +13,8 @@ export default class DataModel {
     const session = new DataSession();
     this.sessions.push(session);
   }
+
+  removeSession(sessionId) {
+    console.log('removing session', this.sessions, sessionId);
+  }
 }

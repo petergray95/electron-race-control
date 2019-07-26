@@ -6,11 +6,17 @@ class DataSession {
   constructor() {
     this.client = new F1TelemetryClient();
 
-    this.client.on(PACKETS.carTelemetry, console.log);
+    this.client.on(PACKETS.carTelemetry, message =>
+      this.addData(this, message)
+    );
   }
 
   run() {
     this.client.start();
+  }
+
+  addMessage(a, message) {
+    console.log(this.client, a, message);
   }
 }
 

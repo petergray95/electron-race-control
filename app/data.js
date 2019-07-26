@@ -20,7 +20,7 @@ class DataSession {
   }
 }
 
-export default class DataModel {
+class DataModel {
   constructor() {
     this.sessions = [];
   }
@@ -34,3 +34,7 @@ export default class DataModel {
     console.log('removing session', this.sessions, sessionId);
   }
 }
+
+const dataModel = new DataModel();
+
+export default dataModel;

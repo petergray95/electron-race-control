@@ -1,11 +1,15 @@
 import React from 'react';
 import { render } from 'react-dom';
 import { AppContainer } from 'react-hot-loader';
+import { ipcRenderer } from 'electron-better-ipc';
+import ipcChannels from './constants/ipc-channels';
 import Root from './containers/Root';
 import { configureStore, history } from './store/configureStore';
 import './app.global.css';
 
 const store = configureStore();
+
+ipcRenderer.on(ipcChannels.DATA, (event, message) => console.log(message));
 
 render(
   <AppContainer>

@@ -1,4 +1,6 @@
+import { ipcMain } from 'electron-better-ipc';
 import { F1TelemetryClient, constants } from 'f1-telemetry-client';
+import ipcChannels from './constants/ipc-channels';
 
 const { PACKETS } = constants;
 
@@ -23,7 +25,7 @@ class DataSession {
 
   addMessage(messageType, message) {
     this.data.push(message);
-    console.log(this.data.length);
+    ipcMain.sendToRenderers(ipcChannels.DATA, this.data.length);
   }
 }
 

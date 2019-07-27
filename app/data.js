@@ -4,19 +4,26 @@ const { PACKETS } = constants;
 
 class DataSession {
   constructor() {
+    this.data = [];
+
     this.client = new F1TelemetryClient();
 
     this.client.on(PACKETS.carTelemetry, message =>
-      this.addData(this, message)
+      this.addData(PACKETS.carTelemetry, message)
     );
+  }
+
+  debug() {
+    setInterval(() => this.addMessage(PACKETS.carTelemetry, { a: 10 }), 100);
   }
 
   run() {
     this.client.start();
   }
 
-  addMessage(self, message) {
-    console.log(this.client, self, message);
+  addMessage(messageType, message) {
+    this.data.push(message);
+    console.log(this.data.length);
   }
 }
 
@@ -28,6 +35,7 @@ class DataModel {
   addSession() {
     const session = new DataSession();
     this.sessions.push(session);
+    return session;
   }
 
   removeSession(sessionId) {
@@ -36,5 +44,7 @@ class DataModel {
 }
 
 const dataModel = new DataModel();
+
+dataModel.addSession().debug();
 
 export default dataModel;

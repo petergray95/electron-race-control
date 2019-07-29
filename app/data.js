@@ -11,7 +11,7 @@ class DataSession {
     this.client = new F1TelemetryClient();
 
     this.client.on(PACKETS.carTelemetry, message =>
-      this.addData(PACKETS.carTelemetry, message)
+      this.addMessage(PACKETS.carTelemetry, message)
     );
   }
 
@@ -25,7 +25,7 @@ class DataSession {
 
   addMessage(messageType, message) {
     this.data.push(message);
-    ipcMain.sendToRenderers(ipcChannels.DATA, this.data.length);
+    ipcMain.sendToRenderers(ipcChannels.DATA, this.data);
   }
 }
 
@@ -47,6 +47,6 @@ class DataModel {
 
 const dataModel = new DataModel();
 
-dataModel.addSession().debug();
+dataModel.addSession().run();
 
 export default dataModel;

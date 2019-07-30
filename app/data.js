@@ -25,7 +25,7 @@ class DataSession {
 
   addMessage(messageType, message) {
     this.data.push(message);
-    ipcMain.sendToRenderers(ipcChannels.DATA, this.data);
+    ipcMain.sendToRenderers(ipcChannels.DATA, message);
   }
 }
 
@@ -47,6 +47,6 @@ class DataModel {
 
 const dataModel = new DataModel();
 
-dataModel.addSession().run();
+dataModel.addSession().debug();
 
 export default dataModel;

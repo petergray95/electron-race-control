@@ -5,11 +5,12 @@ import { ipcRenderer } from 'electron-better-ipc';
 import ipcChannels from './constants/ipc-channels';
 import Root from './containers/Root';
 import { configureStore, history } from './store/configureStore';
+import { increment } from './actions/counter';
 import './app.global.css';
 
 const store = configureStore();
 
-ipcRenderer.on(ipcChannels.DATA, (event, message) => console.log(message));
+ipcRenderer.on(ipcChannels.DATA, () => store.dispatch(increment()));
 
 render(
   <AppContainer>

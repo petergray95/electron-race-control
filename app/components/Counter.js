@@ -5,7 +5,7 @@ import styles from './Counter.css';
 import routes from '../constants/routes';
 
 type Props = {
-  increment: () => void,
+  newMessage: () => void,
   counter: object
 };
 
@@ -13,7 +13,7 @@ export default class Counter extends Component<Props> {
   props: Props;
 
   render() {
-    const { increment, counter } = this.props;
+    const { newMessage, counter } = this.props;
     return (
       <div>
         <div className={styles.backButton} data-tid="backButton">
@@ -27,7 +27,7 @@ export default class Counter extends Component<Props> {
         <div className={styles.btnGroup}>
           <button
             className={styles.btn}
-            onClick={increment}
+            onClick={newMessage}
             data-tclass="btn"
             type="button"
           >

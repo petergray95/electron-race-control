@@ -1,37 +1,12 @@
 // @flow
-import type { GetState, Dispatch } from '../reducers/types';
+// need to be concious of the use of GetState and ability to get state inside an action
+// import type { GetState, Dispatch } from '../reducers/types';
 
 export const INCREMENT_COUNTER = 'INCREMENT_COUNTER';
-export const DECREMENT_COUNTER = 'DECREMENT_COUNTER';
 
-export function increment() {
+export function increment(message) {
   return {
-    type: INCREMENT_COUNTER
-  };
-}
-
-export function decrement() {
-  return {
-    type: DECREMENT_COUNTER
-  };
-}
-
-export function incrementIfOdd() {
-  return (dispatch: Dispatch, getState: GetState) => {
-    const { counter } = getState();
-
-    if (counter % 2 === 0) {
-      return;
-    }
-
-    dispatch(increment());
-  };
-}
-
-export function incrementAsync(delay: number = 1000) {
-  return (dispatch: Dispatch) => {
-    setTimeout(() => {
-      dispatch(increment());
-    }, delay);
+    type: INCREMENT_COUNTER,
+    message
   };
 }

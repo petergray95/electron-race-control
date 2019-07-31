@@ -16,7 +16,14 @@ class DataSession {
   }
 
   debug() {
-    setInterval(() => this.addMessage(PACKETS.carTelemetry, { a: 10 }), 100);
+    setInterval(
+      () =>
+        this.addMessage(PACKETS.carTelemetry, {
+          mspeed: Math.random(),
+          timestamp: new Date()
+        }),
+      200
+    );
   }
 
   run() {

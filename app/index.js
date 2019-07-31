@@ -10,7 +10,9 @@ import './app.global.css';
 
 const store = configureStore();
 
-ipcRenderer.on(ipcChannels.DATA, () => store.dispatch(increment()));
+ipcRenderer.on(ipcChannels.DATA, (event, message) =>
+  store.dispatch(increment(message))
+);
 
 render(
   <AppContainer>

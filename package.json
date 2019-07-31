@@ -115,8 +115,7 @@
     "email": "erc@michaelsansoni.com",
     "url": "http://michaelsansoni.com"
   },
-  "contributors": [
-  ],
+  "contributors": [],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/msansoni/electron-race-control/issues"
@@ -255,6 +254,7 @@
     "history": "^4.7.2",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
+    "react-grid-layout": "^0.16.6",
     "react-hot-loader": "^4.3.12",
     "react-redux": "^5.1.1",
     "react-router": "^4.3.1",

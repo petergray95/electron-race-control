@@ -20,9 +20,9 @@ class DataSession {
       () =>
         this.addMessage(PACKETS.carTelemetry, {
           mspeed: Math.random(),
-          timestamp: new Date()
+          timestamp: new Date().getTime()
         }),
-      200
+      100
     );
   }
 

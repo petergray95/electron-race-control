@@ -7,6 +7,7 @@ const { PACKETS } = constants;
 class DataSession {
   constructor() {
     this.data = [];
+    this.debug_client = null;
 
     this.client = new F1TelemetryClient();
 
@@ -15,8 +16,12 @@ class DataSession {
     );
   }
 
-  debug() {
-    this.client = setInterval(
+  debugStart() {
+    if (this.debug_client) {
+      this.debug_stop();
+    }
+
+    this.debug_client = setInterval(
       () =>
         this.addMessage(PACKETS.carTelemetry, {
           mspeed: Math.random(),
@@ -31,7 +36,12 @@ class DataSession {
   }
 
   stop() {
-    clearInterval(this.client);
+    this.client.stop();
+  }
+
+  debugStop() {
+    clearInterval(this.debug_client);
+    this.debug_client = null;
   }
 
   addMessage(messageType, message) {

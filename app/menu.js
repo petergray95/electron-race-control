@@ -206,16 +206,14 @@ export default class MenuBuilder {
             label: '&Start',
             accelerator: 'F3',
             click: () => {
-              dataModel.sessions[0].debug();
-              console.log('start');
+              dataModel.sessions[0].debugStart();
             }
           },
           {
             label: '&Stop',
             accelerator: 'F4',
             click: () => {
-              dataModel.sessions[0].stop();
-              console.log('stop');
+              dataModel.sessions[0].debugStop();
             }
           }
         ]

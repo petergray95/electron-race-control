@@ -101,5 +101,5 @@ app.on('ready', async () => {
   // eslint-disable-next-line
   new AppUpdater();
 
-  dataModel.addSession().debug();
+  dataModel.addSession();
 });

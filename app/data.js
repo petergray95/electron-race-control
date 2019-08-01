@@ -16,7 +16,7 @@ class DataSession {
   }
 
   debug() {
-    setInterval(
+    this.client = setInterval(
       () =>
         this.addMessage(PACKETS.carTelemetry, {
           mspeed: Math.random(),
@@ -26,8 +26,12 @@ class DataSession {
     );
   }
 
-  run() {
+  start() {
     this.client.start();
+  }
+
+  stop() {
+    clearInterval(this.client);
   }
 
   addMessage(messageType, message) {

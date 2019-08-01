@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import GridLayout from 'react-grid-layout';
 import NumericWidgetPage from '../containers/widgets/NumericWidgetPage';
 
-export default class Counter extends Component<Props> {
+export default class Dash extends Component<Props> {
   props: Props;
 
   render() {

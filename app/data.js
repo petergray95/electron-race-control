@@ -54,6 +54,4 @@ class DataModel {
 
 const dataModel = new DataModel();
 
-dataModel.addSession().debug();
-
 export default dataModel;

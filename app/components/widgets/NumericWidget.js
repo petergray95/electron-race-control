@@ -1,5 +1,7 @@
 // @flow
 import React, { Component } from 'react';
+import Flexbox from 'flexbox-react';
+
 import styles from './NumericWidget.css';
 
 type Props = {
@@ -12,6 +14,16 @@ export default class NumericWidget extends Component<Props> {
   render() {
     const { counter } = this.props;
 
-    return <div className={styles.container}>NW: {counter.timestamp}</div>;
+    return (
+      <Flexbox
+        className={styles.container}
+        flexDirection="column"
+        minHeight="100%"
+      >
+        <Flexbox className={styles.contents} flexGrow={1}>
+          {counter.timestamp}
+        </Flexbox>
+      </Flexbox>
+    );
   }
 }

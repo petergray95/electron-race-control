@@ -1,3 +1,9 @@
 .container {
   background-color: #ccc;
+  overflow: hidden;
+}
+
+.contents {
+  align-items: center;
+  justify-content: center;
 }

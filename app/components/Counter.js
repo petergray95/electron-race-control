@@ -8,7 +8,13 @@ export default class Counter extends Component<Props> {
 
   render() {
     return (
-      <GridLayout className="layout" cols={12} rowHeight={30} width={1200}>
+      <GridLayout
+        className="layout"
+        cols={12}
+        rowHeight={30}
+        width={1200}
+        margin={[5, 5]}
+      >
         <div key="a" data-grid={{ x: 0, y: 0, w: 2, h: 2 }}>
           <NumericWidgetPage />
         </div>

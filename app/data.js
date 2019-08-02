@@ -18,7 +18,7 @@ class DataSession {
 
   debugStart() {
     if (this.debug_client) {
-      this.debug_stop();
+      this.debugStop();
     }
 
     this.debug_client = setInterval(

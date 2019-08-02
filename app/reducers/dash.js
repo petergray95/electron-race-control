@@ -1,8 +1,8 @@
 // @flow
-import { NEW_MESSAGE } from '../actions/counter';
+import { NEW_MESSAGE } from '../actions/dash';
 import type { Action } from './types';
 
-export default function counter(state: object = {}, action: Action) {
+export default function dash(state: object = {}, action: Action) {
   switch (action.type) {
     case NEW_MESSAGE:
       return action.message;

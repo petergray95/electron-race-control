@@ -5,14 +5,14 @@ import Flexbox from 'flexbox-react';
 import styles from './NumericWidget.css';
 
 type Props = {
-  counter: object
+  message: object
 };
 
 export default class NumericWidget extends Component<Props> {
   props: Props;
 
   render() {
-    const { counter } = this.props;
+    const { message } = this.props;
 
     return (
       <Flexbox
@@ -21,7 +21,7 @@ export default class NumericWidget extends Component<Props> {
         minHeight="100%"
       >
         <Flexbox className={styles.contents} flexGrow={1}>
-          {counter.timestamp}
+          {message.timestamp}
         </Flexbox>
       </Flexbox>
     );

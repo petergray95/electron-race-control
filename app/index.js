@@ -5,7 +5,7 @@ import { ipcRenderer } from 'electron-better-ipc';
 import ipcChannels from './constants/ipc-channels';
 import Root from './containers/Root';
 import { configureStore, history } from './store/configureStore';
-import { newMessage } from './actions/counter';
+import { newMessage } from './actions/dash';
 import './app.global.css';
 
 const store = configureStore();

@@ -1,5 +1,9 @@
+.header {
+  background-color: #263238;
+}
+
 .container {
-  background-color: #ccc;
+  background-color: #546e7a;
   border: 1px solid black;
   overflow: hidden;
 }

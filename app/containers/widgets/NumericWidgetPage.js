@@ -3,9 +3,11 @@ import { connect } from 'react-redux';
 import NumericWidget from '../../components/widgets/NumericWidget';
 import * as DashActions from '../../actions/dash';
 
-function mapStateToProps(state) {
+function mapStateToProps(state, props) {
   return {
-    message: state.dash
+    message: state.dash,
+    channel: props.channel,
+    onClose: props.onClose
   };
 }
 

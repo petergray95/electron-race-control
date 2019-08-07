@@ -20,9 +20,9 @@ export default class HeaderWidget extends Component<Props> {
         flexDirection="row"
         minWidth="100%"
         justifyContent="space-between"
-        className={styles.body}
+        className={styles.title}
       >
-        <Flexbox className={styles.title}>{title}</Flexbox>
+        <Flexbox>{title}</Flexbox>
         <Flexbox
           role="button"
           onClick={onClose}

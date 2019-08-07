@@ -1,7 +1,4 @@
-.body {
-  background-color: #263238;
-}
-
 .title {
+  background-color: #263238;
   user-select: none;
 }

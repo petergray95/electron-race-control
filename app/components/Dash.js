@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { WidthProvider, Responsive } from 'react-grid-layout';
 import _ from 'lodash';
 
-import NumericWidgetPage from '../containers/widgets/NumericWidgetPage';
+import BaseWidgetPage from '../containers/widgets/BaseWidgetPage';
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
@@ -33,14 +33,10 @@ export default class Dash extends Component<Props> {
 
   createElement(el) {
     const { i } = el;
-    const channel = 'mspeed';
 
     return (
       <div key={i} data-grid={el}>
-        <NumericWidgetPage
-          channel={channel}
-          onClose={this.onRemoveItem.bind(this, i)}
-        />
+        <BaseWidgetPage onClose={this.onRemoveItem.bind(this, i)} />
       </div>
     );
   }

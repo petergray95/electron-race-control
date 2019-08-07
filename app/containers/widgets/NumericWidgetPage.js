@@ -6,8 +6,7 @@ import * as DashActions from '../../actions/dash';
 function mapStateToProps(state, props) {
   return {
     message: state.dash,
-    channel: props.channel,
-    onClose: props.onClose
+    channel: props.channel
   };
 }
 

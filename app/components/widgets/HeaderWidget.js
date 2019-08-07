@@ -5,7 +5,7 @@ import Flexbox from 'flexbox-react';
 import styles from './HeaderWidget.css';
 
 type Props = {
-  channel: string,
+  title: string,
   onClose: method
 };
 
@@ -13,8 +13,8 @@ export default class HeaderWidget extends Component<Props> {
   props: Props;
 
   render() {
-    const { onClose, channel } = this.props;
-    const title = `Channel: ${channel}`;
+    const { onClose, title } = this.props;
+
     return (
       <Flexbox
         flexDirection="row"

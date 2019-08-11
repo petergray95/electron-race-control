@@ -24,7 +24,8 @@ export default class AppUpdater {
   }
 }
 
-let mainWindow = null;
+let rendererWindow = null;
+let dataWindow = null;
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -68,34 +69,60 @@ app.on('ready', async () => {
     await installExtensions();
   }
 
-  mainWindow = new BrowserWindow({
+  rendererWindow = new BrowserWindow({
     show: false,
     width: 1024,
     height: 728
   });
 
-  mainWindow.loadURL(`file://${__dirname}/app.html`);
+  dataWindow = new BrowserWindow({
+    show: false,
+    width: 1024,
+    height: 728
+  });
+
+  rendererWindow.loadURL(`file://${__dirname}/renderer/app.html`);
+  dataWindow.loadURL(`file://${__dirname}/data/app.html`);
 
   // @TODO: Use 'ready-to-show' event
   //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
-  mainWindow.webContents.on('did-finish-load', () => {
-    if (!mainWindow) {
-      throw new Error('"mainWindow" is not defined');
+  rendererWindow.webContents.on('did-finish-load', () => {
+    if (!rendererWindow) {
+      throw new Error('"rendererWindow" is not defined');
     }
     if (process.env.START_MINIMIZED) {
-      mainWindow.minimize();
+      rendererWindow.minimize();
     } else {
-      mainWindow.show();
-      mainWindow.focus();
+      rendererWindow.show();
+      rendererWindow.focus();
     }
   });
 
-  mainWindow.on('closed', () => {
-    mainWindow = null;
+  // @TODO: Use 'ready-to-show' event
+  //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
+  dataWindow.webContents.on('did-finish-load', () => {
+    if (!dataWindow) {
+      throw new Error('"dataWindow" is not defined');
+    }
+    if (process.env.START_MINIMIZED) {
+      dataWindow.minimize();
+    } else {
+      dataWindow.show();
+    }
   });
 
-  const menuBuilder = new MenuBuilder(mainWindow);
-  menuBuilder.buildMenu();
+  rendererWindow.on('closed', () => {
+    rendererWindow = null;
+  });
+
+  dataWindow.on('closed', () => {
+    rendererWindow = null;
+  });
+
+  const menuBuilderRenderer = new MenuBuilder(rendererWindow);
+  const menuBuilderData = new MenuBuilder(dataWindow);
+  menuBuilderRenderer.buildMenu();
+  menuBuilderData.buildMenu();
 
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line

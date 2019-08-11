@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron-better-ipc';
 import { F1TelemetryClient, constants } from 'f1-telemetry-client';
-import ipcChannels from './constants/ipc-channels';
+import ipcChannels from './data/constants/ipc-channels';
 
 const { PACKETS } = constants;
 

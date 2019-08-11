@@ -1,6 +1,5 @@
 // @flow
 import { app, Menu, shell, BrowserWindow } from 'electron';
-import dataModel from './data';
 
 export default class MenuBuilder {
   mainWindow: BrowserWindow;
@@ -205,16 +204,12 @@ export default class MenuBuilder {
           {
             label: '&Start',
             accelerator: 'F3',
-            click: () => {
-              dataModel.sessions[0].debugStart();
-            }
+            click: () => {}
           },
           {
             label: '&Stop',
             accelerator: 'F4',
-            click: () => {
-              dataModel.sessions[0].debugStop();
-            }
+            click: () => {}
           }
         ]
       },

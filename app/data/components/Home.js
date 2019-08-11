@@ -1,13 +1,20 @@
 // @flow
 import React, { Component } from 'react';
-import DashPage from './Dash';
+
+import dataModel from '../data';
 
 type Props = {};
 
 export default class Home extends Component<Props> {
   props: Props;
 
+  constructor(props) {
+    super(props);
+
+    dataModel.addSession().debugStart();
+  }
+
   render() {
-    return <DashPage />;
+    return <div>hello</div>;
   }
 }

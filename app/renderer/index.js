@@ -1,18 +1,15 @@
 import React from 'react';
 import { render } from 'react-dom';
 import { AppContainer } from 'react-hot-loader';
-import { ipcRenderer } from 'electron-better-ipc';
-import ipcChannels from './constants/ipc-channels';
+import { getInitialStateRenderer } from 'electron-redux';
 import Root from './containers/Root';
-import { configureStore, history } from './store/configureStore';
-import { newMessage } from './actions/dash';
+import configureStore from '../../shared/store/configureStore';
+import getHistory from '../../shared/store/storeHistory';
 import './app.global.css';
 
-const store = configureStore();
-
-ipcRenderer.on(ipcChannels.DATA, (event, message) =>
-  store.dispatch(newMessage(message))
-);
+const history = getHistory('renderer');
+const initialState = getInitialStateRenderer();
+const store = configureStore(initialState, 'renderer');
 
 render(
   <AppContainer>

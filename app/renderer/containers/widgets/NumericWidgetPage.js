@@ -1,7 +1,7 @@
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import NumericWidget from '../../components/widgets/NumericWidget';
-import * as DashActions from '../../actions/dash';
+import * as DashActions from '../../../../shared/actions/dash';
 
 function mapStateToProps(state, props) {
   return {

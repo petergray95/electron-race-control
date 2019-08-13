@@ -7,4 +7,4 @@ const selectedConfigureStore =
     ? configureStoreProd
     : configureStoreDev;
 
-export default selectedConfigureStore;
+export const { configureStore } = selectedConfigureStore;

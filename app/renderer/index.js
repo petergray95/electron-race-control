@@ -3,7 +3,7 @@ import { render } from 'react-dom';
 import { AppContainer } from 'react-hot-loader';
 import { getInitialStateRenderer } from 'electron-redux';
 import Root from './containers/Root';
-import configureStore from '../../shared/store/configureStore';
+import { configureStore } from '../../shared/store/configureStore';
 import getHistory from '../../shared/store/storeHistory';
 import './app.global.css';
 

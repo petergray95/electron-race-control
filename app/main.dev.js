@@ -15,7 +15,7 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { newMessage } from '../shared/actions/dash';
-import configureStore from '../shared/store/configureStore';
+import { configureStore } from '../shared/store/configureStore';
 
 const store = configureStore(undefined, 'main');
 
@@ -114,13 +114,16 @@ app.on('ready', async () => {
     }
   });
 
-  setInterval(() => {
-    const message = {
-      mspeed: Math.random(),
-      timestamp: new Date().getTime()
-    };
-    store.dispatch(newMessage(message));
-  }, 1000);
+  setInterval(
+    () => {
+      const message = {
+        mspeed: Math.random(),
+        timestamp: new Date().getTime()
+      };
+      store.dispatch(newMessage(message));
+    },
+    1000
+  );
 
   rendererWindow.on('closed', () => {
     rendererWindow = null;

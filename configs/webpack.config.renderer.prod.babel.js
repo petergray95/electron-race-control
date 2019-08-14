@@ -22,7 +22,7 @@ export default merge.smart(baseConfig, {
 
   entry: {
     renderer: [path.join(__dirname, '..', 'app/renderer/index')],
-    data: [path.join(__dirname, '..', 'app/data/index')]
+    server: [path.join(__dirname, '..', 'app/server/index')]
   },
 
   output: {

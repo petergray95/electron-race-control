@@ -52,11 +52,11 @@ export default merge.smart(baseConfig, {
       'webpack/hot/only-dev-server',
       require.resolve('../app/renderer/index')
     ],
-    data: [
+    server: [
       'react-hot-loader/patch',
       `webpack-dev-server/client?http://localhost:${port}/`,
       'webpack/hot/only-dev-server',
-      require.resolve('../app/data/index')
+      require.resolve('../app/server/index')
     ]
   },
 

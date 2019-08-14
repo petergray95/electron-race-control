@@ -28,7 +28,7 @@ export default class AppUpdater {
 }
 
 let rendererWindow = null;
-let dataWindow = null;
+let serverWindow = null;
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -78,14 +78,14 @@ app.on('ready', async () => {
     height: 728
   });
 
-  dataWindow = new BrowserWindow({
+  serverWindow = new BrowserWindow({
     show: false,
     width: 1024,
     height: 728
   });
 
   rendererWindow.loadURL(`file://${__dirname}/renderer/app.html`);
-  dataWindow.loadURL(`file://${__dirname}/data/app.html`);
+  serverWindow.loadURL(`file://${__dirname}/server/app.html`);
 
   // @TODO: Use 'ready-to-show' event
   //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
@@ -103,38 +103,35 @@ app.on('ready', async () => {
 
   // @TODO: Use 'ready-to-show' event
   //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
-  dataWindow.webContents.on('did-finish-load', () => {
-    if (!dataWindow) {
-      throw new Error('"dataWindow" is not defined');
+  serverWindow.webContents.on('did-finish-load', () => {
+    if (!serverWindow) {
+      throw new Error('"serverWindow" is not defined');
     }
     if (process.env.START_MINIMIZED) {
-      dataWindow.minimize();
+      serverWindow.minimize();
     } else {
-      dataWindow.show();
+      serverWindow.show();
     }
   });
 
-  setInterval(
-    () => {
-      const message = {
-        mspeed: Math.random(),
-        timestamp: new Date().getTime()
-      };
-      store.dispatch(newMessage(message));
-    },
-    1000
-  );
+  setInterval(() => {
+    const message = {
+      mspeed: Math.random(),
+      timestamp: new Date().getTime()
+    };
+    store.dispatch(newMessage(message));
+  }, 1000);
 
   rendererWindow.on('closed', () => {
     rendererWindow = null;
   });
 
-  dataWindow.on('closed', () => {
+  serverWindow.on('closed', () => {
     rendererWindow = null;
   });
 
   const menuBuilderRenderer = new MenuBuilder(rendererWindow);
-  const menuBuilderData = new MenuBuilder(dataWindow);
+  const menuBuilderData = new MenuBuilder(serverWindow);
   menuBuilderRenderer.buildMenu();
   menuBuilderData.buildMenu();
 

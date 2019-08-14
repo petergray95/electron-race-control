@@ -7,7 +7,7 @@ import fs from 'fs';
 function CheckBuildsExist() {
   const mainPath = path.join(__dirname, '..', '..', 'app', 'main.prod.js');
   const rendererPath = getRendererPath('renderer');
-  const dataPath = getRendererPath('data');
+  const dataPath = getRendererPath('server');
 
   if (!fs.existsSync(mainPath)) {
     throw new Error(

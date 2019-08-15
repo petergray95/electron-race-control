@@ -14,10 +14,10 @@ import { app, BrowserWindow } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
+import { configureStore } from '../shared/store/configureStore';
 
-// If I need the store in main
-// import { configureStore } from '../shared/store/configureStore';
-// const store = configureStore(undefined, 'main');
+const store = configureStore(undefined, 'main');
+console.log('Store initialised in main: ', store);
 
 export default class AppUpdater {
   constructor() {

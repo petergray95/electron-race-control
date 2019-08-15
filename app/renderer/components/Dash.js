@@ -1,9 +1,11 @@
 // @flow
+import { ipcRenderer } from 'electron-better-ipc';
 import React, { Component } from 'react';
 import { WidthProvider, Responsive } from 'react-grid-layout';
 import _ from 'lodash';
 
 import BaseWidgetPage from '../containers/widgets/BaseWidgetPage';
+import ipcConstants from '../../../shared/constants/ipc-channels';
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
@@ -28,7 +30,24 @@ export default class Dash extends Component<Props> {
       newCounter: 0
     };
 
-    this.onAddItem = this.onAddItem.bind(this);
+    this.addItem = this.addItem.bind(this);
+
+    this.initialiseCommands();
+  }
+
+  initialiseCommands() {
+    ipcRenderer.on(ipcConstants.COMMAND, (event, message) => {
+      switch (message) {
+        case "dash:addwidget": {
+          this.addItem();
+          break;
+        }
+        default: {
+          console.log(message);
+          break;
+        }
+      }
+    })
   }
 
   createElement(el) {
@@ -41,7 +60,7 @@ export default class Dash extends Component<Props> {
     );
   }
 
-  onAddItem() {
+  addItem() {
     this.setState(prevState => ({
       items: prevState.items.concat({
         i: `n  ${prevState.newCounter}`,
@@ -63,9 +82,6 @@ export default class Dash extends Component<Props> {
 
     return (
       <div>
-        <button type="button" onClick={this.onAddItem}>
-          Add Item
-        </button>
         <ResponsiveReactGridLayout {...this.props}>
           {_.map(items, el => this.createElement(el))}
         </ResponsiveReactGridLayout>

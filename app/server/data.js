@@ -27,7 +27,7 @@ class DataSession {
           mspeed: Math.random(),
           timestamp: new Date().getTime()
         }),
-      1000
+      100
     );
   }
 

@@ -256,6 +256,7 @@
     "flexbox-react": "^4.4.0",
     "history": "^4.7.2",
     "react": "^16.6.3",
+    "react-command-palette": "^0.3.0-0",
     "react-dom": "^16.6.3",
     "react-grid-layout": "^0.16.6",
     "react-hot-loader": "^4.3.12",

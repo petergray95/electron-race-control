@@ -13,8 +13,11 @@
 import { app, BrowserWindow } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import { ipcMain } from 'electron-better-ipc';
+
 import MenuBuilder from './menu';
 import { configureStore } from '../shared/store/configureStore';
+import ipcConstants from '../shared/constants/ipc-channels';
 
 const store = configureStore(undefined, 'main');
 console.log('Store initialised in main: ', store);
@@ -131,3 +134,7 @@ app.on('ready', async () => {
   // eslint-disable-next-line
   new AppUpdater();
 });
+
+ipcMain.on(ipcConstants.COMMAND, (event, message) => {
+  ipcMain.sendToRenderers(ipcConstants.COMMAND, message);
+})

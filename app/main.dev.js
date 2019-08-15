@@ -14,10 +14,10 @@ import { app, BrowserWindow } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
-import { newMessage } from '../shared/actions/dash';
-import { configureStore } from '../shared/store/configureStore';
 
-const store = configureStore(undefined, 'main');
+// If I need the store in main
+// import { configureStore } from '../shared/store/configureStore';
+// const store = configureStore(undefined, 'main');
 
 export default class AppUpdater {
   constructor() {
@@ -114,14 +114,6 @@ app.on('ready', async () => {
     }
   });
 
-  setInterval(() => {
-    const message = {
-      mspeed: Math.random(),
-      timestamp: new Date().getTime()
-    };
-    store.dispatch(newMessage(message));
-  }, 1000);
-
   rendererWindow.on('closed', () => {
     rendererWindow = null;
   });
@@ -131,9 +123,9 @@ app.on('ready', async () => {
   });
 
   const menuBuilderRenderer = new MenuBuilder(rendererWindow);
-  const menuBuilderData = new MenuBuilder(serverWindow);
+  const menuBuilderServer = new MenuBuilder(serverWindow);
   menuBuilderRenderer.buildMenu();
-  menuBuilderData.buildMenu();
+  menuBuilderServer.buildMenu();
 
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line

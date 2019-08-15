@@ -7,7 +7,7 @@ import fs from 'fs';
 function CheckBuildsExist() {
   const mainPath = path.join(__dirname, '..', '..', 'app', 'main.prod.js');
   const rendererPath = getRendererPath('renderer');
-  const dataPath = getRendererPath('server');
+  const serverPath = getRendererPath('server');
 
   if (!fs.existsSync(mainPath)) {
     throw new Error(
@@ -25,10 +25,10 @@ function CheckBuildsExist() {
     );
   }
 
-  if (!fs.existsSync(dataPath)) {
+  if (!fs.existsSync(serverPath)) {
     throw new Error(
       chalk.whiteBright.bgRed.bold(
-        'The data process is not built yet. Build it by running "yarn build-renderer"'
+        'The server process is not built yet. Build it by running "yarn build-renderer"'
       )
     );
   }

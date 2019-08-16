@@ -1,20 +1,13 @@
 // @flow
 import React, { Component } from 'react';
-
-import dataModel from '../data';
+import SessionsPage from '../containers/SessionsPage';
 
 type Props = {};
 
 export default class Home extends Component<Props> {
   props: Props;
 
-  constructor(props) {
-    super(props);
-
-    dataModel.addSession();
-  }
-
   render() {
-    return <div>hello</div>;
+    return <SessionsPage />;
   }
 }

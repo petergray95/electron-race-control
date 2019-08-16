@@ -11,14 +11,11 @@ import {
 } from 'electron-redux';
 import createRootReducer from '../reducers';
 import * as DashActions from '../actions/dash';
-import type { dashStateType } from '../reducers/types';
+import * as SessionActions from '../actions/sessions';
 
 import getHistory from './storeHistory';
 
-const configureStore = (
-  initialState?: dashStateType,
-  scope: string = 'main'
-) => {
+const configureStore = (initialState, scope: string = 'main') => {
   const history = getHistory(scope);
   const rootReducer = createRootReducer(history, scope);
 
@@ -53,6 +50,7 @@ const configureStore = (
   // Redux DevTools Configuration
   const actionCreators = {
     ...DashActions,
+    ...SessionActions,
     ...routerActions
   };
   // If Redux DevTools Extension is installed use it, otherwise use Redux compose

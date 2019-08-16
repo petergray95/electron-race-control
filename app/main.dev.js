@@ -18,6 +18,7 @@ import { ipcMain } from 'electron-better-ipc';
 import MenuBuilder from './menu';
 import { configureStore } from '../shared/store/configureStore';
 import ipcConstants from '../shared/constants/ipc-channels';
+import { addSession } from '../shared/actions/sessions';
 
 const store = configureStore(undefined, 'main');
 console.log('Store initialised in main: ', store);
@@ -135,6 +136,19 @@ app.on('ready', async () => {
   new AppUpdater();
 });
 
+// IPC switches for commands
 ipcMain.on(ipcConstants.COMMAND, (event, message) => {
-  ipcMain.sendToRenderers(ipcConstants.COMMAND, message);
-})
+  switch (message) {
+    case 'server:addlivedebugsession': {
+      const config = {
+        model: 'debug'
+      };
+      store.dispatch(addSession(config));
+      break;
+    }
+    default: {
+      ipcMain.sendToRenderers(ipcConstants.COMMAND, message);
+      break;
+    }
+  }
+});

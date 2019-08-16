@@ -1,9 +1,5 @@
 import type { Dispatch as ReduxDispatch, Store as ReduxStore } from 'redux';
 
-export type DashStateType = {
-  +message: object
-};
-
 export type Action = {
   +type: string
 };

@@ -10,13 +10,9 @@ import {
   replayActionRenderer
 } from 'electron-redux';
 import createRootReducer from '../reducers';
-import type { dashStateType } from '../reducers/types';
 import getHistory from './storeHistory';
 
-const configureStore = (
-  initialState?: dashStateType,
-  scope: string = 'main'
-) => {
+const configureStore = (initialState, scope: string = 'main') => {
   const history = getHistory(scope);
 
   const rootReducer = createRootReducer(history, scope);

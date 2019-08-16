@@ -4,8 +4,8 @@ import React, { Component } from 'react';
 import { WidthProvider, Responsive } from 'react-grid-layout';
 import _ from 'lodash';
 
-import BaseWidgetPage from '../containers/widgets/BaseWidgetPage';
 import ipcConstants from '../../../shared/constants/ipc-channels';
+import BaseWidgetPage from '../containers/widgets/BaseWidgetPage';
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
@@ -43,7 +43,6 @@ export default class Dash extends Component<Props> {
           break;
         }
         default: {
-          console.log(message);
           break;
         }
       }

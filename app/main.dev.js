@@ -110,12 +110,11 @@ app.on('ready', async () => {
     if (!serverWindow) {
       throw new Error('"serverWindow" is not defined');
     }
-    serverWindow.minimize();
-    // if (process.env.START_MINIMIZED) {
-    //   serverWindow.minimize();
-    // } else {
-    //   serverWindow.show();
-    // }
+    if (process.env.START_MINIMIZED) {
+      serverWindow.minimize();
+    } else {
+      serverWindow.show();
+    }
   });
 
   rendererWindow.on('closed', () => {

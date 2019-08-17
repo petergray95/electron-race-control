@@ -18,7 +18,6 @@ import { ipcMain } from 'electron-better-ipc';
 import MenuBuilder from './menu';
 import { configureStore } from '../shared/store/configureStore';
 import ipcConstants from '../shared/constants/ipc-channels';
-import { addSession } from '../shared/actions/sessions';
 
 const store = configureStore(undefined, 'main');
 console.log('Store initialised in main: ', store);
@@ -111,11 +110,12 @@ app.on('ready', async () => {
     if (!serverWindow) {
       throw new Error('"serverWindow" is not defined');
     }
-    if (process.env.START_MINIMIZED) {
-      serverWindow.minimize();
-    } else {
-      serverWindow.show();
-    }
+    serverWindow.minimize();
+    // if (process.env.START_MINIMIZED) {
+    //   serverWindow.minimize();
+    // } else {
+    //   serverWindow.show();
+    // }
   });
 
   rendererWindow.on('closed', () => {
@@ -138,17 +138,5 @@ app.on('ready', async () => {
 
 // IPC switches for commands
 ipcMain.on(ipcConstants.COMMAND, (event, message) => {
-  switch (message) {
-    case 'server:addlivedebugsession': {
-      const config = {
-        model: 'debug'
-      };
-      store.dispatch(addSession(config));
-      break;
-    }
-    default: {
-      ipcMain.sendToRenderers(ipcConstants.COMMAND, message);
-      break;
-    }
-  }
+  ipcMain.sendToRenderers(ipcConstants.COMMAND, message);
 });

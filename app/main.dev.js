@@ -137,6 +137,5 @@ app.on('ready', async () => {
 
 // IPC switches for commands
 ipcMain.on(ipcConstants.COMMAND, (event, message) => {
-  console.log(message);
   ipcMain.sendToRenderers(ipcConstants.COMMAND, message);
 });

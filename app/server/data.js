@@ -9,6 +9,8 @@ class BaseDataSessionLive {
     this.data = [];
     this.name = 'base';
     this.id = uuidv4();
+
+    this.isRunning = false;
   }
 
   start() {
@@ -35,10 +37,12 @@ class DataSessionLive extends BaseDataSessionLive {
 
   start() {
     this.client.start();
+    this.isRunning = true;
   }
 
   stop() {
     this.client.stop();
+    this.isRunning = false;
   }
 
   addMessage(messageType, message) {
@@ -54,7 +58,7 @@ class DataSessionDebug extends BaseDataSessionLive {
   }
 
   start() {
-    if (this.client) {
+    if (this.isRunning) {
       this.stop();
     }
 
@@ -67,11 +71,14 @@ class DataSessionDebug extends BaseDataSessionLive {
         }),
       100
     );
+
+    this.isRunning = true;
   }
 
   stop() {
     clearInterval(this.client);
     this.client = null;
+    this.isRunning = false;
   }
 
   addMessage(messageType, message) {
@@ -112,6 +119,10 @@ class DataModel {
   }
 
   removeSession(id) {
+    const Session = this.sessions[id];
+    if (Session.isRunning) {
+      Session.stop();
+    }
     delete this.sessions[id];
   }
 }

@@ -12,7 +12,7 @@ import './app.global.css';
 const history = getHistory('renderer');
 
 ipcRenderer.on(ipcConstants.COMMAND, (event, message) => {
-  switch (message) {
+  switch (message[0]) {
     case 'navigation:browser': {
       history.push(routes.BROWSER);
       break;

@@ -3,7 +3,7 @@
 // import type { GetState, Dispatch } from '../reducers/types';
 
 export const UPDATE_SESSIONS = 'UPDATE_SESSIONS';
-export const ADD_DATA = 'ADD_DATA';
+export const UPDATE_DATA = 'UPDATE_DATA';
 
 export function updateSessions(sessions) {
   return {
@@ -12,9 +12,9 @@ export function updateSessions(sessions) {
   };
 }
 
-export function addData(id, data) {
+export function updateData(id, data) {
   return {
-    type: ADD_DATA,
+    type: UPDATE_DATA,
     payload: { id, data }
   };
 }

@@ -20,7 +20,7 @@ export default class Sessions extends Component<Props> {
         menuItem: `Session: ${id}`,
         render: () => (
           <Tab.Pane inverted attached={false}>
-            <Session />
+            <Session session={sessions[id]} />
           </Tab.Pane>
         )
       };

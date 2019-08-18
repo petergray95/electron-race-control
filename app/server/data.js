@@ -61,6 +61,7 @@ class DataSessionDebug extends BaseDataSessionLive {
     this.client = setInterval(
       () =>
         this.addMessage(PACKETS.carTelemetry, {
+          id: this.id,
           mspeed: Math.random(),
           timestamp: new Date().getTime()
         }),
@@ -69,7 +70,7 @@ class DataSessionDebug extends BaseDataSessionLive {
   }
 
   stop() {
-    clearInterval(this.debug_client);
+    clearInterval(this.client);
     this.debug_client = null;
   }
 
@@ -87,13 +88,18 @@ const DataSessionFactory = type =>
 
 class DataModel {
   constructor() {
-    this.sessions = [];
+    this.sessions = {};
+  }
+
+  getSession(id) {
+    return this.sessions[id];
   }
 
   getStoreSessions() {
     const sessions = {};
-    this.sessions.forEach(session => {
-      sessions[session.id] = { id: session.id, name: session.name };
+    Object.keys(this.sessions).forEach(id => {
+      const Session = this.sessions[id];
+      sessions[Session.id] = { id: Session.id, name: Session.name };
     });
     return sessions;
   }
@@ -101,7 +107,7 @@ class DataModel {
   addSession() {
     const SessionFactory = DataSessionFactory('debug');
     const Session = new SessionFactory();
-    this.sessions.push(Session);
+    this.sessions[Session.id] = Session;
     return Session;
   }
 

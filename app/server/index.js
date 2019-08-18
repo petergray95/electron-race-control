@@ -14,10 +14,22 @@ const history = getHistory('renderer');
 
 // IPC commands
 ipcRenderer.on(ipcConstants.COMMAND, (event, message) => {
-  switch (message) {
-    case 'server:addlivedebugsession': {
+  switch (message[0]) {
+    case 'server:addsession': {
       dataModel.addSession();
       store.dispatch(updateSessions(dataModel.getStoreSessions()));
+      break;
+    }
+    case 'server:start': {
+      const id = message[1];
+      const Session = dataModel.getSession(id);
+      Session.start();
+      break;
+    }
+    case 'server:stop': {
+      const id = message[1];
+      const Session = dataModel.getSession(id);
+      Session.stop();
       break;
     }
     default: {

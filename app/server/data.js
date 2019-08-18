@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import { F1TelemetryClient, constants } from 'f1-telemetry-client';
 
 const { PACKETS } = constants;
@@ -7,6 +8,7 @@ class BaseDataSessionLive {
     this.client = null;
     this.data = [];
     this.name = 'base';
+    this.id = uuidv4();
   }
 
   start() {
@@ -73,6 +75,7 @@ class DataSessionDebug extends BaseDataSessionLive {
 
   addMessage(messageType, message) {
     this.data.push(message);
+    console.log(message);
   }
 }
 
@@ -82,4 +85,31 @@ const DataSessionFactory = type =>
     debug: DataSessionDebug
   }[type]);
 
-export default DataSessionFactory;
+class DataModel {
+  constructor() {
+    this.sessions = [];
+  }
+
+  getStoreSessions() {
+    const sessions = {};
+    this.sessions.forEach(session => {
+      sessions[session.id] = { id: session.id, name: session.name };
+    });
+    return sessions;
+  }
+
+  addSession() {
+    const SessionFactory = DataSessionFactory('debug');
+    const Session = new SessionFactory();
+    this.sessions.push(Session);
+    return Session;
+  }
+
+  removeSession() {
+    this.sessions = [];
+  }
+}
+
+const dataModel = new DataModel();
+
+export default dataModel;

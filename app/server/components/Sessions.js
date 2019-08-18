@@ -4,7 +4,7 @@ import { Header, Tab } from 'semantic-ui-react';
 import Session from './Session';
 
 type Props = {
-  sessions: array
+  sessions: object
 };
 
 export default class Sessions extends Component<Props> {
@@ -15,23 +15,36 @@ export default class Sessions extends Component<Props> {
 
     const tabs = [];
 
-    sessions.forEach((session, index)  => {
-      const tab = { menuItem: `Session: ${index+1}`, render: () => <Tab.Pane inverted attached={false}><Session /></Tab.Pane> };
+    Object.keys(sessions).forEach(id => {
+      const tab = {
+        menuItem: `Session: ${id}`,
+        render: () => (
+          <Tab.Pane inverted attached={false}>
+            <Session />
+          </Tab.Pane>
+        )
+      };
       tabs.push(tab);
     });
 
     const renderTabs = (
-      <Tab menu={{ inverted: true, secondary: true, pointing: true }} panes={tabs} />
+      <Tab
+        menu={{ inverted: true, secondary: true, pointing: true }}
+        panes={tabs}
+      />
     );
 
     const renderNoTabs = (
-      <Header as='h1' inverted>No servers or sessions loaded. Create a recorder or load a session to begin.</Header>
+      <Header as="h1" inverted>
+        No servers or sessions loaded. Create a recorder or load a session to
+        begin.
+      </Header>
     );
 
     if (tabs.length === 0) {
-      return renderNoTabs
+      return renderNoTabs;
     }
 
-    return renderTabs
+    return renderTabs;
   }
 }

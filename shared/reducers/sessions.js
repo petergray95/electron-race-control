@@ -1,15 +1,12 @@
 // @flow
-import { ADD_SESSION, REMOVE_SESSION } from '../actions/sessions';
+import { UPDATE_SESSIONS, ADD_DATA } from '../actions/sessions';
 import type { Action } from './types';
-import DataSessionFactory from '../data';
 
 export default function sessions(state: array = [], action: Action) {
   switch (action.type) {
-    case ADD_SESSION: {
-      const Session = DataSessionFactory(action.payload.model);
-      return [...state, new Session(action.payload)];
-    }
-    case REMOVE_SESSION:
+    case UPDATE_SESSIONS:
+      return action.payload;
+    case ADD_DATA:
       return [];
     default:
       return state;

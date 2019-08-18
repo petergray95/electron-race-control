@@ -2,19 +2,19 @@
 // need to be concious of the use of GetState and ability to get state inside an action
 // import type { GetState, Dispatch } from '../reducers/types';
 
-export const ADD_SESSION = 'ADD_SESSION';
-export const REMOVE_SESSION = 'REMOVE_SESSION';
+export const UPDATE_SESSIONS = 'UPDATE_SESSIONS';
+export const ADD_DATA = 'ADD_DATA';
 
-export function addSession(config) {
+export function updateSessions(sessions) {
   return {
-    type: ADD_SESSION,
-    payload: config
+    type: UPDATE_SESSIONS,
+    payload: sessions
   };
 }
 
-export function removeSession(id) {
+export function addData(id, data) {
   return {
-    type: REMOVE_SESSION,
-    payload: id
+    type: ADD_DATA,
+    payload: { id, data }
   };
 }

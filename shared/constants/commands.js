@@ -6,28 +6,31 @@ const commands = [
     category: 'Dash',
     name: 'Dash: Add Widget',
     command() {
-      ipcRenderer.send(ipcConstants.COMMAND, ['dash:addwidget']);
+      ipcRenderer.send(ipcConstants.COMMAND, { command: 'dash:addwidget' });
     }
   },
   {
     category: 'Navigation',
     name: 'Navigation: Browser',
     command() {
-      ipcRenderer.send(ipcConstants.COMMAND, ['navigation:browser']);
+      ipcRenderer.send(ipcConstants.COMMAND, { command: 'navigation:browser' });
     }
   },
   {
     category: 'Navigation',
     name: 'Navigation: Dash',
     command() {
-      ipcRenderer.send(ipcConstants.COMMAND, ['navigation:dash']);
+      ipcRenderer.send(ipcConstants.COMMAND, { command: 'navigation:dash' });
     }
   },
   {
     category: 'Server',
     name: 'Server: Add Live (Debug) Session',
     command() {
-      ipcRenderer.send(ipcConstants.COMMAND, ['server:addsession', 'debug']);
+      ipcRenderer.send(ipcConstants.COMMAND, {
+        command: 'server:addsession',
+        server_type: 'debug'
+      });
     }
   }
 ];

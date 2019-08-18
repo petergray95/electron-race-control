@@ -18,26 +18,43 @@ export default class Session extends Component<Props> {
     return (
       <div className={styles.container}>
         <Header as="h1" inverted>{`Data Server: ${session.id}`}</Header>
+        <Button.Group>
+          <Button
+            positive
+            labelPosition="left"
+            icon="play"
+            content="Start"
+            onClick={() => {
+              ipcRenderer.send(ipcConstants.COMMAND, {
+                command: 'server:start',
+                session_id: session.id
+              });
+            }}
+          />
+          <Button
+            negative
+            labelPosition="left"
+            icon="stop"
+            content="Stop"
+            onClick={() => {
+              ipcRenderer.send(ipcConstants.COMMAND, {
+                command: 'server:stop',
+                session_id: session.id
+              });
+            }}
+          />
+        </Button.Group>
         <Button
-          positive
+          color="grey"
+          content="Remove Session"
+          icon="trash"
           onClick={() => {
-            ipcRenderer.send(ipcConstants.COMMAND, [
-              'server:start',
-              session.id
-            ]);
+            ipcRenderer.send(ipcConstants.COMMAND, {
+              command: 'server:remove',
+              session_id: session.id
+            });
           }}
-        >
-          Start
-        </Button>
-        <Button
-          negative
-          onClick={() => {
-            ipcRenderer.send(ipcConstants.COMMAND, ['server:stop', session.id]);
-          }}
-        >
-          Stop
-        </Button>
-        <Button color="grey">Remove Session</Button>
+        />
       </div>
     );
   }

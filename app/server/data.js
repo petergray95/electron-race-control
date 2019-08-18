@@ -71,7 +71,7 @@ class DataSessionDebug extends BaseDataSessionLive {
 
   stop() {
     clearInterval(this.client);
-    this.debug_client = null;
+    this.client = null;
   }
 
   addMessage(messageType, message) {
@@ -111,8 +111,8 @@ class DataModel {
     return Session;
   }
 
-  removeSession() {
-    this.sessions = [];
+  removeSession(id) {
+    delete this.sessions[id];
   }
 }
 

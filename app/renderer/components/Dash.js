@@ -37,7 +37,7 @@ export default class Dash extends Component<Props> {
 
   initialiseCommands() {
     ipcRenderer.on(ipcConstants.COMMAND, (event, message) => {
-      switch (message[0]) {
+      switch (message.command) {
         case 'dash:addwidget': {
           this.addItem();
           break;

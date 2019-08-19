@@ -1,17 +1,17 @@
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import NumericWidget from '../../components/widgets/NumericWidget';
-import * as DashActions from '../../../../shared/actions/dash';
+import * as DataActions from '../../../../shared/actions/data';
 
 function mapStateToProps(state, props) {
   return {
-    message: state.dash,
+    data: state.data,
     channel: props.channel
   };
 }
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators(DashActions, dispatch);
+  return bindActionCreators(DataActions, dispatch);
 }
 
 export default connect(

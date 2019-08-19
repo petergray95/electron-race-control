@@ -1,5 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { F1TelemetryClient, constants } from 'f1-telemetry-client';
+import { updateData } from '../../shared/actions/data';
+import store from './store';
 
 const { PACKETS } = constants;
 
@@ -47,6 +49,7 @@ class DataSessionLive extends BaseDataSessionLive {
 
   addMessage(messageType, message) {
     this.data.push(message);
+    store.dispatch(updateData(this.id, this.data));
   }
 }
 
@@ -69,7 +72,7 @@ class DataSessionDebug extends BaseDataSessionLive {
           mspeed: Math.random(),
           timestamp: new Date().getTime()
         }),
-      100
+      50
     );
 
     this.isRunning = true;
@@ -83,7 +86,7 @@ class DataSessionDebug extends BaseDataSessionLive {
 
   addMessage(messageType, message) {
     this.data.push(message);
-    console.log(message);
+    store.dispatch(updateData(this.id, this.data));
   }
 }
 

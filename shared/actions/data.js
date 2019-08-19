@@ -2,11 +2,11 @@
 // need to be concious of the use of GetState and ability to get state inside an action
 // import type { GetState, Dispatch } from '../reducers/types';
 
-export const NEW_MESSAGE = 'NEW_MESSAGE';
+export const UPDATE_DATA = 'UPDATE_DATA';
 
-export function newMessage(message) {
+export function updateData(id, data) {
   return {
-    type: NEW_MESSAGE,
-    payload: message
+    type: UPDATE_DATA,
+    payload: { id, data }
   };
 }

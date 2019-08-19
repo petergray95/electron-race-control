@@ -1,10 +1,10 @@
 // @flow
-import { NEW_MESSAGE } from '../actions/dash';
+import { UPDATE_DATA } from '../actions/data';
 import type { Action } from './types';
 
-export default function dash(state: object = {}, action: Action) {
+export default function data(state: object = {}, action: Action) {
   switch (action.type) {
-    case NEW_MESSAGE:
+    case UPDATE_DATA:
       return action.payload;
     default:
       return state;

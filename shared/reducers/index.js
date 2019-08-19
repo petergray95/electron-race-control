@@ -1,7 +1,7 @@
 // @flow
 import { combineReducers } from 'redux';
 import { connectRouter } from 'connected-react-router';
-import dash from './dash';
+import data from './data';
 import sessions from './sessions';
 
 export default function createRootReducer(
@@ -10,7 +10,7 @@ export default function createRootReducer(
 ) {
   return combineReducers({
     ...(scope === 'renderer' && { router: connectRouter(history) }),
-    dash,
+    data,
     sessions
   });
 }

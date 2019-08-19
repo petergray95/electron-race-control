@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { F1TelemetryClient, constants } from 'f1-telemetry-client';
 import { updateData } from '../../shared/actions/data';
+import { addSession, removeSession } from '../../shared/actions/sessions';
 import store from './store';
 
 const { PACKETS } = constants;
@@ -86,7 +87,7 @@ class DataSessionDebug extends BaseDataSessionLive {
 
   addMessage(messageType, message) {
     this.data.push(message);
-    store.dispatch(updateData(this.id, this.data));
+    store.dispatch(updateData(this.id, this.data.slice(-50)));
   }
 }
 
@@ -105,28 +106,27 @@ class DataModel {
     return this.sessions[id];
   }
 
-  getStoreSessions() {
-    const sessions = {};
-    Object.keys(this.sessions).forEach(id => {
-      const Session = this.sessions[id];
-      sessions[Session.id] = { id: Session.id, name: Session.name };
-    });
-    return sessions;
-  }
-
   addSession() {
     const SessionFactory = DataSessionFactory('debug');
-    const Session = new SessionFactory();
-    this.sessions[Session.id] = Session;
-    return Session;
+    const session = new SessionFactory();
+    this.sessions[session.id] = session;
+
+    const config = {
+      id: session.id,
+      name: session.name
+    };
+
+    store.dispatch(addSession(config));
   }
 
   removeSession(id) {
-    const Session = this.sessions[id];
-    if (Session.isRunning) {
-      Session.stop();
+    const session = this.sessions[id];
+    if (session.isRunning) {
+      session.stop();
     }
     delete this.sessions[id];
+
+    store.dispatch(removeSession(id));
   }
 }
 

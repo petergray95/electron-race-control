@@ -15,9 +15,9 @@ export default class Sessions extends Component<Props> {
 
     const tabs = [];
 
-    Object.keys(sessions).forEach(id => {
+    Object.keys(sessions).forEach((id, index) => {
       const tab = {
-        menuItem: `Session: ${id}`,
+        menuItem: `Session ${index + 1}`,
         render: () => (
           <Tab.Pane inverted attached={false}>
             <Session session={sessions[id]} />

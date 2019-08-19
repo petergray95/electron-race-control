@@ -2,7 +2,6 @@ import React from 'react';
 import { render } from 'react-dom';
 import { AppContainer } from 'react-hot-loader';
 import { ipcRenderer } from 'electron-better-ipc';
-import { updateSessions } from '../../shared/actions/sessions';
 import ipcConstants from '../../shared/constants/ipc-channels';
 import Root from './containers/Root';
 import getHistory from '../../shared/store/storeHistory';
@@ -17,24 +16,22 @@ ipcRenderer.on(ipcConstants.COMMAND, (event, message) => {
   switch (message.command) {
     case 'server:addsession': {
       dataModel.addSession();
-      store.dispatch(updateSessions(dataModel.getStoreSessions()));
       break;
     }
     case 'server:start': {
       const id = message.session_id;
-      const Session = dataModel.getSession(id);
-      Session.start();
+      const session = dataModel.getSession(id);
+      session.start();
       break;
     }
     case 'server:stop': {
       const id = message.session_id;
-      const Session = dataModel.getSession(id);
-      Session.stop();
+      const session = dataModel.getSession(id);
+      session.stop();
       break;
     }
     case 'server:remove': {
       dataModel.removeSession(message.session_id);
-      store.dispatch(updateSessions(dataModel.getStoreSessions()));
       break;
     }
     default: {

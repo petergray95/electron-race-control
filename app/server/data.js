@@ -1,7 +1,7 @@
-import { v4 as uuidv4 } from 'uuid';
 import { F1TelemetryClient, constants } from 'f1-telemetry-client';
 import { updateData } from '../../shared/actions/data';
 import { addSession, removeSession } from '../../shared/actions/sessions';
+import { updateCursor } from '../../shared/actions/cursor';
 import store from './store';
 
 const { PACKETS } = constants;
@@ -11,8 +11,7 @@ class BaseDataSessionLive {
     this.client = null;
     this.data = [];
     this.name = 'base';
-    this.id = uuidv4();
-
+    this.id = 1;
     this.isRunning = false;
   }
 
@@ -69,11 +68,11 @@ class DataSessionDebug extends BaseDataSessionLive {
     this.client = setInterval(
       () =>
         this.addMessage(PACKETS.carTelemetry, {
-          id: this.id,
+          sessionId: this.id,
           mspeed: Math.random(),
           timestamp: new Date().getTime()
         }),
-      50
+      20
     );
 
     this.isRunning = true;
@@ -87,7 +86,12 @@ class DataSessionDebug extends BaseDataSessionLive {
 
   addMessage(messageType, message) {
     this.data.push(message);
-    store.dispatch(updateData(this.id, this.data.slice(-50)));
+    // store.dispatch(updateData(this.id, this.data.slice(-5)));
+    const cursor = {
+      sessionId: this.id,
+      values: this.data[this.data.length - 1]
+    };
+    store.dispatch(updateCursor(cursor));
   }
 }
 
@@ -112,7 +116,7 @@ class DataModel {
     this.sessions[session.id] = session;
 
     const config = {
-      id: session.id,
+      sessionId: session.id,
       name: session.name
     };
 

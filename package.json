@@ -255,6 +255,7 @@
     "f1-telemetry-client": "^0.1.15",
     "flexbox-react": "^4.4.0",
     "history": "^4.7.2",
+    "lodash": "^4.17.15",
     "react": "^16.6.3",
     "react-command-palette": "^0.3.0-0",
     "react-dom": "^16.6.3",

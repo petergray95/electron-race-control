@@ -1,17 +1,18 @@
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import NumericWidget from '../../components/widgets/NumericWidget';
-import * as DataActions from '../../../../shared/actions/data';
+import * as CursorActions from '../../../../shared/actions/cursor';
+import { getCursorValue } from '../../../../shared/reducers/cursor';
 
 function mapStateToProps(state, props) {
   return {
-    data: state.data,
+    value: getCursorValue(state, 1, props.channel),
     channel: props.channel
   };
 }
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators(DataActions, dispatch);
+  return bindActionCreators(CursorActions, dispatch);
 }
 
 export default connect(

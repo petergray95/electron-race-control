@@ -10,6 +10,7 @@ import {
   replayActionRenderer
 } from 'electron-redux';
 import createRootReducer from '../reducers';
+import * as CursorActions from '../actions/cursor';
 import * as DataActions from '../actions/data';
 import * as SessionActions from '../actions/sessions';
 
@@ -49,6 +50,7 @@ const configureStore = (initialState, scope: string = 'main') => {
 
   // Redux DevTools Configuration
   const actionCreators = {
+    ...CursorActions,
     ...DataActions,
     ...SessionActions,
     ...routerActions

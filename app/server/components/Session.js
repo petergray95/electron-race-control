@@ -55,7 +55,7 @@ export default class Session extends Component<Props> {
               onClick={() => {
                 ipcRenderer.send(ipcConstants.COMMAND, {
                   command: 'server:start',
-                  session_id: session.id
+                  sessionId: session.sessionId
                 });
               }}
             />
@@ -67,7 +67,7 @@ export default class Session extends Component<Props> {
               onClick={() => {
                 ipcRenderer.send(ipcConstants.COMMAND, {
                   command: 'server:stop',
-                  session_id: session.id
+                  sessionId: session.sessionId
                 });
               }}
             />
@@ -78,7 +78,7 @@ export default class Session extends Component<Props> {
               onClick={() => {
                 ipcRenderer.send(ipcConstants.COMMAND, {
                   command: 'server:remove',
-                  session_id: session.id
+                  sessionId: session.sessionId
                 });
               }}
             />

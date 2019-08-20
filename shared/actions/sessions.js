@@ -12,9 +12,9 @@ export function addSession(config) {
   };
 }
 
-export function removeSession(id) {
+export function removeSession(sessionId) {
   return {
     type: REMOVE_SESSION,
-    payload: { id }
+    payload: { sessionId }
   };
 }

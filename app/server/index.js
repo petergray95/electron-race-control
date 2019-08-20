@@ -19,19 +19,20 @@ ipcRenderer.on(ipcConstants.COMMAND, (event, message) => {
       break;
     }
     case 'server:start': {
-      const id = message.session_id;
-      const session = dataModel.getSession(id);
+      const { sessionId } = message;
+      const session = dataModel.getSession(sessionId);
       session.start();
       break;
     }
     case 'server:stop': {
-      const id = message.session_id;
-      const session = dataModel.getSession(id);
+      const { sessionId } = message;
+      const session = dataModel.getSession(sessionId);
       session.stop();
       break;
     }
     case 'server:remove': {
-      dataModel.removeSession(message.session_id);
+      const { sessionId } = message;
+      dataModel.removeSession(sessionId);
       break;
     }
     default: {

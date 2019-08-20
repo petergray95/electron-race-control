@@ -1,6 +1,7 @@
 // @flow
 import { combineReducers } from 'redux';
 import { connectRouter } from 'connected-react-router';
+import cursor from './cursor';
 import data from './data';
 import sessions from './sessions';
 
@@ -10,6 +11,7 @@ export default function createRootReducer(
 ) {
   return combineReducers({
     ...(scope === 'renderer' && { router: connectRouter(history) }),
+    cursor,
     data,
     sessions
   });

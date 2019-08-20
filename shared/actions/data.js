@@ -4,9 +4,9 @@
 
 export const UPDATE_DATA = 'UPDATE_DATA';
 
-export function updateData(id, data) {
+export function updateData(message) {
   return {
     type: UPDATE_DATA,
-    payload: { id, data }
+    payload: message
   };
 }

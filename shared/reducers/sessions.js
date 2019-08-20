@@ -17,3 +17,9 @@ export default function sessions(state: object = {}, action: Action) {
       return state;
   }
 }
+
+const getSessionIds = state => Object.keys(state.sessions);
+
+const getSession = (state, sessionId) => state.sessions[sessionId];
+
+export { getSessionIds, getSession };

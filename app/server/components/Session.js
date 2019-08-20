@@ -7,32 +7,21 @@ import ipcConstants from '../../../shared/constants/ipc-channels';
 import styles from './Session.css';
 
 type Props = {
-  session: object
+  session: object,
+  sessionCursorMeta: object
 };
 
 export default class Session extends Component<Props> {
   props: Props;
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      type: 'debug',
-      id: props.session.id,
-      name: props.session.name,
-      ipAddress: ''
-    };
-  }
-
-  handleChange = (e, { name, value }) => this.setState({ [name]: value });
-
-  handleSubmit = () => {
-    console.log('submit');
-  };
-
   render() {
-    const { session } = this.props;
-    const { type, id, name, ipAddress } = this.state;
+    const { session, sessionCursorMeta } = this.props;
+
+    const type = 'type';
+    const sessionId = 'id';
+    const name = 'name';
+    const ipAddress = 'ip';
+
     return (
       <div className={styles.container}>
         <Form inverted onSubmit={this.handleSubmit}>
@@ -40,7 +29,7 @@ export default class Session extends Component<Props> {
             Data Server
           </Header>
           <Form.Input fluid disabled label="Type" value={type} />
-          <Form.Input fluid disabled label="ID" value={id} />
+          <Form.Input fluid disabled label="ID" value={sessionId} />
           <Form.Input fluid label="Name" value={name} />
           <Form.Input fluid label="IP Address" value={ipAddress} />
         </Form>
@@ -84,6 +73,14 @@ export default class Session extends Component<Props> {
             />
           </Form.Group>
         </Form>
+
+        <Header as="h3" inverted>
+          Last Record: {sessionCursorMeta.lastRecord}
+        </Header>
+
+        <Header as="h3" inverted>
+          Number of Records: {sessionCursorMeta.numberRecords}
+        </Header>
       </div>
     );
   }

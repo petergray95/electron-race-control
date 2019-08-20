@@ -6,7 +6,7 @@ import { getCursorValue } from '../../../../shared/reducers/cursor';
 
 function mapStateToProps(state, props) {
   return {
-    value: getCursorValue(state, 1, props.channel),
+    value: getCursorValue(state, props.sessionId, props.channel),
     channel: props.channel
   };
 }

@@ -4,9 +4,9 @@
 
 export const UPDATE_CURSOR = 'UPDATE_CURSOR';
 
-export function updateCursor(data) {
+export function updateCursor(cursor) {
   return {
     type: UPDATE_CURSOR,
-    payload: data
+    payload: cursor
   };
 }

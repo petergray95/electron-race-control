@@ -8,14 +8,15 @@ import HeaderWidget from './HeaderWidget';
 import NumericWidgetPage from '../../containers/widgets/NumericWidgetPage';
 
 type Props = {
-  onClose: method
+  onClose: method,
+  sessionId: string
 };
 
 export default class BaseWidget extends Component<Props> {
   props: Props;
 
   render() {
-    const { onClose } = this.props;
+    const { onClose, sessionId } = this.props;
     const channel = 'timestamp';
     return (
       <Flexbox
@@ -27,7 +28,7 @@ export default class BaseWidget extends Component<Props> {
           <HeaderWidget title="Numeric Widget" onClose={onClose} />
         </Flexbox>
         <Flexbox flexGrow={1}>
-          <NumericWidgetPage channel={channel} />
+          <NumericWidgetPage sessionId={sessionId} channel={channel} />
         </Flexbox>
       </Flexbox>
     );

@@ -1,50 +1,46 @@
 // @flow
 import React, { Component } from 'react';
 import { Header, Tab } from 'semantic-ui-react';
-import Session from './Session';
+import SessionPage from '../containers/SessionPage';
 
 type Props = {
-  sessions: object
+  sessionIds: array
 };
 
 export default class Sessions extends Component<Props> {
   props: Props;
 
   render() {
-    const { sessions } = this.props;
+    const { sessionIds } = this.props;
+
+    if (sessionIds.length === 0) {
+      return (
+        <Header as="h1" inverted>
+          No servers or sessions loaded. Create a recorder or load a session to
+          begin.
+        </Header>
+      );
+    }
 
     const tabs = [];
 
-    Object.keys(sessions).forEach((id, index) => {
+    sessionIds.forEach((sessionId, index) => {
       const tab = {
         menuItem: `Session ${index + 1}`,
         render: () => (
           <Tab.Pane inverted attached={false}>
-            <Session session={sessions[id]} />
+            <SessionPage sessionId={sessionId} />
           </Tab.Pane>
         )
       };
       tabs.push(tab);
     });
 
-    const renderTabs = (
+    return (
       <Tab
         menu={{ inverted: true, secondary: true, pointing: true }}
         panes={tabs}
       />
     );
-
-    const renderNoTabs = (
-      <Header as="h1" inverted>
-        No servers or sessions loaded. Create a recorder or load a session to
-        begin.
-      </Header>
-    );
-
-    if (tabs.length === 0) {
-      return renderNoTabs;
-    }
-
-    return renderTabs;
   }
 }

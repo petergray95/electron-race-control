@@ -1,3 +1,5 @@
+import _ from 'lodash';
+import { v4 as uuid } from 'uuid';
 import { F1TelemetryClient, constants } from 'f1-telemetry-client';
 import { updateData } from '../../shared/actions/data';
 import { addSession, removeSession } from '../../shared/actions/sessions';
@@ -11,8 +13,17 @@ class BaseDataSessionLive {
     this.client = null;
     this.data = [];
     this.name = 'base';
-    this.id = 1;
+    this.id = uuid();
     this.isRunning = false;
+    this.throttledUpdateStore = _.throttle(this.updateStore, 100);
+  }
+
+  updateStore() {
+    const message = {
+      sessionId: this.id,
+      values: this.data.slice(-1000)
+    };
+    store.dispatch(updateData(message));
   }
 
   start() {
@@ -49,7 +60,6 @@ class DataSessionLive extends BaseDataSessionLive {
 
   addMessage(messageType, message) {
     this.data.push(message);
-    store.dispatch(updateData(this.id, this.data));
   }
 }
 
@@ -86,10 +96,15 @@ class DataSessionDebug extends BaseDataSessionLive {
 
   addMessage(messageType, message) {
     this.data.push(message);
-    // store.dispatch(updateData(this.id, this.data.slice(-5)));
+    this.throttledUpdateStore();
+
     const cursor = {
       sessionId: this.id,
-      values: this.data[this.data.length - 1]
+      values: message,
+      meta: {
+        numberRecords: this.data.length,
+        lastRecord: message.timestamp
+      }
     };
     store.dispatch(updateCursor(cursor));
   }

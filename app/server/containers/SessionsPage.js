@@ -1,19 +1,12 @@
-import { bindActionCreators } from 'redux';
+// @flow
 import { connect } from 'react-redux';
 import Sessions from '../components/Sessions';
-import * as SessionActions from '../../../shared/actions/sessions';
+import { getSessionIds } from '../../../shared/reducers/sessions';
 
 function mapStateToProps(state) {
   return {
-    sessions: state.sessions
+    sessionIds: getSessionIds(state)
   };
 }
 
-function mapDispatchToProps(dispatch) {
-  return bindActionCreators(SessionActions, dispatch);
-}
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Sessions);
+export default connect(mapStateToProps)(Sessions);

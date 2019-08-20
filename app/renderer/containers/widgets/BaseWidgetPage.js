@@ -1,16 +1,13 @@
 // @flow
-import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { getSessionIds } from '../../../../shared/reducers/sessions';
 import BaseWidget from '../../components/widgets/BaseWidget';
 
-type Props = {
-  onClose: method
-};
-
-export default class BaseWidgetPage extends Component<Props> {
-  props: Props;
-
-  render() {
-    const { onClose } = this.props;
-    return <BaseWidget onClose={onClose} />;
-  }
+function mapStateToProps(state, props) {
+  return {
+    onClose: props.onClose,
+    sessionId: getSessionIds(state)[0]
+  };
 }
+
+export default connect(mapStateToProps)(BaseWidget);

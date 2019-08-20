@@ -6,8 +6,8 @@ import type { Action } from './types';
 export default function cursor(state: object = {}, action: Action) {
   switch (action.type) {
     case UPDATE_CURSOR: {
-      const { sessionId, values } = action.payload;
-      return { ...state, [sessionId]: { sessionId, values } };
+      const { sessionId, values, meta } = action.payload;
+      return { ...state, [sessionId]: { sessionId, values, meta } };
     }
     default:
       return state;
@@ -17,4 +17,7 @@ export default function cursor(state: object = {}, action: Action) {
 const getCursorValue = (state, sessionId, channel) =>
   _.get(state, ['cursor', sessionId, 'values', channel], '');
 
-export { getCursorValue };
+const getCursorMeta = (state, sessionId) =>
+  _.get(state, ['cursor', sessionId, 'meta'], {});
+
+export { getCursorValue, getCursorMeta };

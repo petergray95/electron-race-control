@@ -16,6 +16,7 @@ class BaseDataSessionLive {
     this.buffer = [];
     this.name = 'base';
     this.id = uuid();
+    this.color = '#ff0000';
     this.isRunning = false;
     this.throttledUpdateStoreData = _.throttle(this.updateStoreData, 200);
     this.throttledUpdateStoreCursor = _.throttle(this.updateStoreCursor, 50);
@@ -160,7 +161,8 @@ class DataModel {
 
     const config = {
       sessionId: session.id,
-      name: session.name
+      name: session.name,
+      color: session.color
     };
 
     store.dispatch(addSession(config));

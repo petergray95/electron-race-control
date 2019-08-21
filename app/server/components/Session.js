@@ -20,6 +20,7 @@ export default class Session extends Component<Props> {
     const type = 'type';
     const sessionId = 'id';
     const name = 'name';
+    const color = '#ff0000';
     const ipAddress = 'ip';
 
     return (
@@ -28,9 +29,12 @@ export default class Session extends Component<Props> {
           <Header as="h1" inverted>
             Data Server
           </Header>
-          <Form.Input fluid disabled label="Type" value={type} />
-          <Form.Input fluid disabled label="ID" value={sessionId} />
+          <Form.Group widths="equal" inline>
+            <Form.Input fluid disabled label="Type" value={type} />
+            <Form.Input fluid disabled label="ID" value={sessionId} />
+          </Form.Group>
           <Form.Input fluid label="Name" value={name} />
+          <Form.Input fluid label="Color" value={color} />
           <Form.Input fluid label="IP Address" value={ipAddress} />
         </Form>
 
@@ -86,12 +90,12 @@ export default class Session extends Component<Props> {
         </Form>
 
         <Header as="h3" inverted>
-          Last Record:{' '}
+          Last record:{' '}
           {new Date(sessionCursorMeta.lastRecord).toLocaleTimeString()}
         </Header>
 
         <Header as="h3" inverted>
-          Number of Records: {sessionCursorMeta.numberRecords}
+          Number of records: {sessionCursorMeta.numberRecords}
         </Header>
       </div>
     );

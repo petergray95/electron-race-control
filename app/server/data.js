@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import { v4 as uuid } from 'uuid';
+import fs from 'fs';
 import { F1TelemetryClient, constants } from 'f1-telemetry-client';
 import { updateData } from '../../shared/actions/data';
 import { addSession, removeSession } from '../../shared/actions/sessions';
@@ -12,19 +13,29 @@ class BaseDataSessionLive {
   constructor() {
     this.client = null;
     this.data = [];
+    this.buffer = [];
     this.name = 'base';
     this.id = uuid();
     this.isRunning = false;
     this.throttledUpdateStoreData = _.throttle(this.updateStoreData, 200);
-    this.throttledUpdateStoreCurosr = _.throttle(this.updateStoreCursor, 50);
+    this.throttledUpdateStoreCursor = _.throttle(this.updateStoreCursor, 50);
   }
 
   updateStoreData() {
-    const message = {
-      sessionId: this.id,
-      values: this.data.slice(-1000)
-    };
-    store.dispatch(updateData(message));
+    const messages = {};
+
+    this.buffer.forEach(dataPoint => {
+      const message = {
+        sessionId: this.id,
+        timestamp: dataPoint.timestamp,
+        values: dataPoint
+      };
+
+      messages[message.timestamp] = message;
+    });
+
+    store.dispatch(updateData(this.id, messages));
+    this.buffer = [];
   }
 
   updateStoreCursor(message) {
@@ -39,6 +50,20 @@ class BaseDataSessionLive {
     store.dispatch(updateCursor(cursor));
   }
 
+  downloadSession() {
+    const filename = 'test.etx';
+    const blob = {
+      header: {
+        name: this.name
+      },
+      data: this.data
+    };
+
+    fs.writeFile(filename, JSON.stringify(blob), err => {
+      if (err) throw err;
+    });
+  }
+
   start() {
     console.log(this);
     throw new Error('session start not implemented');
@@ -51,8 +76,9 @@ class BaseDataSessionLive {
 
   addMessage(messageType, message) {
     this.data.push(message);
-    this.throttledUpdateStoreData();
-    this.throttledUpdateStoreCurosr(message);
+    this.buffer.push(message);
+    // this.throttledUpdateStoreData();
+    this.throttledUpdateStoreCursor(message);
   }
 }
 
@@ -90,15 +116,17 @@ class DataSessionDebug extends BaseDataSessionLive {
       this.stop();
     }
 
-    this.client = setInterval(
-      () =>
-        this.addMessage(PACKETS.carTelemetry, {
-          sessionId: this.id,
-          mspeed: Math.random(),
-          timestamp: new Date().getTime()
-        }),
-      20
-    );
+    this.client = setInterval(() => {
+      const message = {
+        sessionId: this.id,
+        timestamp: new Date().getTime()
+      };
+      Array.from(Array(250).keys()).forEach(i => {
+        const key = `${i}`;
+        message[key] = Math.random();
+      });
+      this.addMessage(PACKETS.carTelemetry, message);
+    }, 20);
 
     this.isRunning = true;
   }
@@ -121,8 +149,8 @@ class DataModel {
     this.sessions = {};
   }
 
-  getSession(id) {
-    return this.sessions[id];
+  getSession(sessionId) {
+    return this.sessions[sessionId];
   }
 
   addSession() {
@@ -138,14 +166,19 @@ class DataModel {
     store.dispatch(addSession(config));
   }
 
-  removeSession(id) {
-    const session = this.sessions[id];
+  removeSession(sessionId) {
+    const session = this.getSession(sessionId);
     if (session.isRunning) {
       session.stop();
     }
-    delete this.sessions[id];
+    delete this.sessions[sessionId];
 
-    store.dispatch(removeSession(id));
+    store.dispatch(removeSession(sessionId));
+  }
+
+  async downloadSession(sessionId) {
+    const session = this.getSession(sessionId);
+    session.downloadSession();
   }
 }
 

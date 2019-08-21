@@ -71,11 +71,23 @@ export default class Session extends Component<Props> {
                 });
               }}
             />
+            <Form.Button
+              color="blue"
+              content="Export Session"
+              icon="download"
+              onClick={() => {
+                ipcRenderer.send(ipcConstants.COMMAND, {
+                  command: 'server:download',
+                  sessionId: session.sessionId
+                });
+              }}
+            />
           </Form.Group>
         </Form>
 
         <Header as="h3" inverted>
-          Last Record: {sessionCursorMeta.lastRecord}
+          Last Record:{' '}
+          {new Date(sessionCursorMeta.lastRecord).toLocaleTimeString()}
         </Header>
 
         <Header as="h3" inverted>

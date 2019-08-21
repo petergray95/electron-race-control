@@ -35,6 +35,11 @@ ipcRenderer.on(ipcConstants.COMMAND, (event, message) => {
       dataModel.removeSession(sessionId);
       break;
     }
+    case 'server:download': {
+      const { sessionId } = message;
+      dataModel.downloadSession(sessionId);
+      break;
+    }
     default: {
       break;
     }

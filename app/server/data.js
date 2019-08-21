@@ -15,15 +15,28 @@ class BaseDataSessionLive {
     this.name = 'base';
     this.id = uuid();
     this.isRunning = false;
-    this.throttledUpdateStore = _.throttle(this.updateStore, 100);
+    this.throttledUpdateStoreData = _.throttle(this.updateStoreData, 200);
+    this.throttledUpdateStoreCurosr = _.throttle(this.updateStoreCursor, 50);
   }
 
-  updateStore() {
+  updateStoreData() {
     const message = {
       sessionId: this.id,
       values: this.data.slice(-1000)
     };
     store.dispatch(updateData(message));
+  }
+
+  updateStoreCursor(message) {
+    const cursor = {
+      sessionId: this.id,
+      values: message,
+      meta: {
+        numberRecords: this.data.length,
+        lastRecord: message.timestamp
+      }
+    };
+    store.dispatch(updateCursor(cursor));
   }
 
   start() {
@@ -34,6 +47,12 @@ class BaseDataSessionLive {
   stop() {
     console.log(this);
     throw new Error('session stop not implemented');
+  }
+
+  addMessage(messageType, message) {
+    this.data.push(message);
+    this.throttledUpdateStoreData();
+    this.throttledUpdateStoreCurosr(message);
   }
 }
 
@@ -56,10 +75,6 @@ class DataSessionLive extends BaseDataSessionLive {
   stop() {
     this.client.stop();
     this.isRunning = false;
-  }
-
-  addMessage(messageType, message) {
-    this.data.push(message);
   }
 }
 
@@ -92,21 +107,6 @@ class DataSessionDebug extends BaseDataSessionLive {
     clearInterval(this.client);
     this.client = null;
     this.isRunning = false;
-  }
-
-  addMessage(messageType, message) {
-    this.data.push(message);
-    this.throttledUpdateStore();
-
-    const cursor = {
-      sessionId: this.id,
-      values: message,
-      meta: {
-        numberRecords: this.data.length,
-        lastRecord: message.timestamp
-      }
-    };
-    store.dispatch(updateCursor(cursor));
   }
 }
 

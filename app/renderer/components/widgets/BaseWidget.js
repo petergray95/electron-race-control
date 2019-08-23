@@ -8,7 +8,8 @@ import HeaderWidgetPage from '../../containers/widgets/HeaderWidgetPage';
 import NumericWidgetPage from '../../containers/widgets/NumericWidgetPage';
 
 type Props = {
-  onClose: method
+  onClose: method,
+  sessions: object
 };
 
 type State = {
@@ -26,16 +27,38 @@ export default class BaseWidget extends Component<Props> {
 
     this.state = {
       channel: '49',
-      activeSessionId: ''
+      activeSessionId: (Object.keys(props.sessions).length > 0) ? Object.values(props.sessions)[0].sessionId : ''
     };
   }
 
-  handleActiveSessionChange = sessionId =>
-    this.setState({ activeSessionId: sessionId });
+  componentDidUpdate(prevProps) {
+    const { sessions } = this.props;
+    if (sessions !== prevProps.sessions) {
+      this.onSessionsUpdate();
+    }
+  };
+
+  onSessionsUpdate() {
+    const { sessions } = this.props;
+    const { activeSessionId } = this.state;
+
+    if (Object.keys(sessions).length === 0 && activeSessionId.length !== 0) {
+      this.setState({activeSessionId: ''});
+    };
+
+    if (Object.keys(sessions).length > 0 && activeSessionId.length === 0) {
+      this.setState({activeSessionId: Object.values(sessions)[0].sessionId});
+    };
+  };
+
+  handleActiveSessionChange = (event, data) => {
+    this.setState({ activeSessionId: data.value });
+  }
 
   render() {
-    const { onClose } = this.props;
+    const { onClose, sessions } = this.props;
     const { activeSessionId, channel } = this.state;
+
     return (
       <Flexbox
         className={styles.container}
@@ -45,6 +68,7 @@ export default class BaseWidget extends Component<Props> {
         <Flexbox>
           <HeaderWidgetPage
             title="Numeric Widget"
+            sessions={sessions}
             onClose={onClose}
             activeSessionId={activeSessionId}
             handleActiveSessionChange={this.handleActiveSessionChange}

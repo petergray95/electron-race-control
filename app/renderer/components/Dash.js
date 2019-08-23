@@ -20,7 +20,7 @@ export default class Dash extends Component<Props> {
     super(props);
 
     this.state = {
-      items: [0, 1, 2, 3, 4].map(i => ({
+      items: [0].map(i => ({
         i: i.toString(),
         x: i * 2,
         y: 0,

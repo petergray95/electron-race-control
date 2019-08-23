@@ -1,9 +1,11 @@
 import { connect } from 'react-redux';
+import { getCursorTimestamp } from '../../../../shared/reducers/cursor';
 import HeaderWidget from '../../components/widgets/HeaderWidget';
 
 function mapStateToProps(state, props) {
   return {
-    ...props
+    ...props,
+    timestamp: getCursorTimestamp(state, props.sessionId),
   };
 }
 

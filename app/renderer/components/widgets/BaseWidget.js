@@ -4,6 +4,7 @@ import Flexbox from 'flexbox-react';
 
 import styles from './BaseWidget.css';
 
+import TitleBarWidgetPage from '../../containers/widgets/TitleBarWidgetPage';
 import HeaderWidgetPage from '../../containers/widgets/HeaderWidgetPage';
 import NumericWidgetPage from '../../containers/widgets/NumericWidgetPage';
 
@@ -66,7 +67,7 @@ export default class BaseWidget extends Component<Props> {
         minHeight="100%"
       >
         <Flexbox>
-          <HeaderWidgetPage
+          <TitleBarWidgetPage
             title="Numeric Widget"
             sessions={sessions}
             onClose={onClose}
@@ -74,8 +75,13 @@ export default class BaseWidget extends Component<Props> {
             handleActiveSessionChange={this.handleActiveSessionChange}
           />
         </Flexbox>
-        <Flexbox flexGrow={1}>
-          <NumericWidgetPage sessionId={activeSessionId} channel={channel} />
+        <Flexbox flexDirection="column" flexGrow={1}>
+          <Flexbox>
+            <HeaderWidgetPage sessionId={activeSessionId}/>
+          </Flexbox>
+          <Flexbox flexGrow={1}>
+            <NumericWidgetPage sessionId={activeSessionId} channel={channel} />
+          </Flexbox>
         </Flexbox>
       </Flexbox>
     );

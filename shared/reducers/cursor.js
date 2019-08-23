@@ -17,7 +17,10 @@ export default function cursor(state: object = {}, action: Action) {
 const getCursorValue = (state, sessionId, channel) =>
   _.get(state, ['cursor', sessionId, 'values', channel], '');
 
+const getCursorTimestamp = (state, sessionId) =>
+  _.get(state, ['cursor', sessionId, 'values', 'timestamp'], 0);
+
 const getCursorMeta = (state, sessionId) =>
   _.get(state, ['cursor', sessionId, 'meta'], {});
 
-export { getCursorValue, getCursorMeta };
+export { getCursorValue, getCursorMeta, getCursorTimestamp };

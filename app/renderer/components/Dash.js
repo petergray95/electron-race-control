@@ -81,7 +81,7 @@ export default class Dash extends Component<Props> {
 
     return (
       <div>
-        <ResponsiveReactGridLayout {...this.props}>
+        <ResponsiveReactGridLayout {...this.props} draggableHandle='.titlebar'>
           {_.map(items, el => this.createElement(el))}
         </ResponsiveReactGridLayout>
       </div>

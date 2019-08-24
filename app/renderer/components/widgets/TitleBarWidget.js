@@ -27,7 +27,7 @@ const TitleBarWidget = (props) => {
       flexDirection="row"
       minWidth="100%"
       justifyContent="space-between"
-      className={styles.title}
+      className={['titlebar', styles.titlebar].join(' ')}
     >
       <Flexbox>{title}</Flexbox>
       <Flexbox>

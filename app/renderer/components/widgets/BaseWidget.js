@@ -7,6 +7,7 @@ import styles from './BaseWidget.css';
 import TitleBarWidgetPage from '../../containers/widgets/TitleBarWidgetPage';
 import HeaderWidgetPage from '../../containers/widgets/HeaderWidgetPage';
 import NumericWidgetPage from '../../containers/widgets/NumericWidgetPage';
+import WidgetSettingsModal from './WidgetSettingsModal';
 
 type Props = {
   onClose: method,
@@ -28,7 +29,8 @@ export default class BaseWidget extends Component<Props> {
 
     this.state = {
       channel: '49',
-      activeSessionId: (Object.keys(props.sessions).length > 0) ? Object.values(props.sessions)[0].sessionId : ''
+      activeSessionId: (Object.keys(props.sessions).length > 0) ? Object.values(props.sessions)[0].sessionId : '',
+      isWidgetSettingsOpen: false
     };
   }
 
@@ -54,11 +56,16 @@ export default class BaseWidget extends Component<Props> {
 
   handleActiveSessionChange = (event, data) => {
     this.setState({ activeSessionId: data.value });
-  }
+  };
+
+  handleSettingsToggle = () => {
+    const { isWidgetSettingsOpen } = this.state;
+    this.setState({ isWidgetSettingsOpen: !isWidgetSettingsOpen});
+  };
 
   render() {
     const { onClose, sessions } = this.props;
-    const { activeSessionId, channel } = this.state;
+    const { activeSessionId, channel, isWidgetSettingsOpen } = this.state;
 
     return (
       <Flexbox
@@ -67,6 +74,7 @@ export default class BaseWidget extends Component<Props> {
         minHeight="100%"
       >
         <Flexbox>
+          <WidgetSettingsModal handleSettingsToggle={this.handleSettingsToggle} isOpen={isWidgetSettingsOpen} />
           <TitleBarWidgetPage
             title="Numeric Widget"
             sessions={sessions}
@@ -77,7 +85,7 @@ export default class BaseWidget extends Component<Props> {
         </Flexbox>
         <Flexbox flexDirection="column" flexGrow={1}>
           <Flexbox>
-            <HeaderWidgetPage sessionId={activeSessionId}/>
+            <HeaderWidgetPage handleSettingsToggle={this.handleSettingsToggle} sessionId={activeSessionId}/>
           </Flexbox>
           <Flexbox flexGrow={1}>
             <NumericWidgetPage sessionId={activeSessionId} channel={channel} />

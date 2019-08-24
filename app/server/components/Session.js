@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import { Header, Form } from 'semantic-ui-react';
 import { ipcRenderer } from 'electron-better-ipc';
+import Moment from 'react-moment';
 import ipcConstants from '../../../shared/constants/ipc-channels';
 
 import styles from './Session.css';
@@ -22,6 +23,9 @@ export default class Session extends Component<Props> {
     const name = 'name';
     const color = '#ff0000';
     const ipAddress = 'ip';
+
+    const { lastRecord } = sessionCursorMeta;
+    const lastRecordValid = lastRecord > 0;
 
     return (
       <div className={styles.container}>
@@ -91,7 +95,7 @@ export default class Session extends Component<Props> {
 
         <Header as="h3" inverted>
           Last record:{' '}
-          {new Date(sessionCursorMeta.lastRecord).toLocaleTimeString()}
+          { lastRecordValid ? (<Moment unix format='HH:mm:ss.SSS'>{lastRecord/1000}</Moment>) : null}
         </Header>
 
         <Header as="h3" inverted>

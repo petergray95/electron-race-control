@@ -28,8 +28,11 @@ export default class BaseWidget extends Component<Props> {
     super(props);
 
     this.state = {
-      channel: '49',
-      activeSessionId: (Object.keys(props.sessions).length > 0) ? Object.values(props.sessions)[0].sessionId : '',
+      channel: 'm_engineRPM',
+      activeSessionId:
+        Object.keys(props.sessions).length > 0
+          ? Object.values(props.sessions)[0].sessionId
+          : '',
       isWidgetSettingsOpen: false
     };
   }
@@ -39,20 +42,20 @@ export default class BaseWidget extends Component<Props> {
     if (sessions !== prevProps.sessions) {
       this.onSessionsUpdate();
     }
-  };
+  }
 
   onSessionsUpdate() {
     const { sessions } = this.props;
     const { activeSessionId } = this.state;
 
     if (Object.keys(sessions).length === 0 && activeSessionId.length !== 0) {
-      this.setState({activeSessionId: ''});
-    };
+      this.setState({ activeSessionId: '' });
+    }
 
     if (Object.keys(sessions).length > 0 && activeSessionId.length === 0) {
-      this.setState({activeSessionId: Object.values(sessions)[0].sessionId});
-    };
-  };
+      this.setState({ activeSessionId: Object.values(sessions)[0].sessionId });
+    }
+  }
 
   handleActiveSessionChange = (event, data) => {
     this.setState({ activeSessionId: data.value });
@@ -60,7 +63,7 @@ export default class BaseWidget extends Component<Props> {
 
   handleSettingsToggle = () => {
     const { isWidgetSettingsOpen } = this.state;
-    this.setState({ isWidgetSettingsOpen: !isWidgetSettingsOpen});
+    this.setState({ isWidgetSettingsOpen: !isWidgetSettingsOpen });
   };
 
   render() {
@@ -74,7 +77,10 @@ export default class BaseWidget extends Component<Props> {
         minHeight="100%"
       >
         <Flexbox>
-          <WidgetSettingsModal handleSettingsToggle={this.handleSettingsToggle} isOpen={isWidgetSettingsOpen} />
+          <WidgetSettingsModal
+            handleSettingsToggle={this.handleSettingsToggle}
+            isOpen={isWidgetSettingsOpen}
+          />
           <TitleBarWidgetPage
             title="Numeric Widget"
             sessions={sessions}
@@ -85,7 +91,10 @@ export default class BaseWidget extends Component<Props> {
         </Flexbox>
         <Flexbox flexDirection="column" flexGrow={1}>
           <Flexbox>
-            <HeaderWidgetPage handleSettingsToggle={this.handleSettingsToggle} sessionId={activeSessionId}/>
+            <HeaderWidgetPage
+              handleSettingsToggle={this.handleSettingsToggle}
+              sessionId={activeSessionId}
+            />
           </Flexbox>
           <Flexbox flexGrow={1}>
             <NumericWidgetPage sessionId={activeSessionId} channel={channel} />

@@ -12,8 +12,8 @@ export default class NumericWidget extends Component<Props> {
   props: Props;
 
   state = {
-    prefix: '49',
-    suffix: 'ms-1'
+    prefix: 'prefix',
+    suffix: 'suffix'
   };
 
   render() {

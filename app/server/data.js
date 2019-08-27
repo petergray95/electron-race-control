@@ -44,6 +44,7 @@ class BaseDataSessionLive {
       sessionId: this.id,
       values: message,
       meta: {
+        timestamp: new Date().getTime(),
         numberRecords: this.data.length,
         lastRecord: message.timestamp
       }
@@ -155,7 +156,7 @@ class DataModel {
   }
 
   addSession() {
-    const SessionFactory = DataSessionFactory('debug');
+    const SessionFactory = DataSessionFactory('live');
     const session = new SessionFactory();
     this.sessions[session.id] = session;
 

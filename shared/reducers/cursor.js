@@ -14,13 +14,24 @@ export default function cursor(state: object = {}, action: Action) {
   }
 }
 
-const getCursorValue = (state, sessionId, channel) =>
-  _.get(state, ['cursor', sessionId, 'values', channel], '');
+const getPlayerIndex = (state, sessionId) =>
+  _.get(
+    state,
+    ['cursor', sessionId, 'values', 'm_header', 'm_playerCarIndex'],
+    null
+  );
+
+const getCursorValue = (state, sessionId, playerIndex, channel) =>
+  _.get(
+    state,
+    ['cursor', sessionId, 'values', 'm_carTelemetryData', playerIndex, channel],
+    null
+  );
 
 const getCursorTimestamp = (state, sessionId) =>
-  _.get(state, ['cursor', sessionId, 'values', 'timestamp'], 0);
+  _.get(state, ['cursor', sessionId, 'meta', 'timestamp'], 0);
 
 const getCursorMeta = (state, sessionId) =>
   _.get(state, ['cursor', sessionId, 'meta'], {});
 
-export { getCursorValue, getCursorMeta, getCursorTimestamp };
+export { getPlayerIndex, getCursorValue, getCursorTimestamp, getCursorMeta };

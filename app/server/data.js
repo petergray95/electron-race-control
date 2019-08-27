@@ -58,8 +58,10 @@ class BaseDataSessionLive {
       header: {
         name: this.name
       },
-      data: this.data
+      data: { ...this.data }
     };
+
+    console.log(this.data, JSON.stringify(blob));
 
     fs.writeFile(filename, JSON.stringify(blob), err => {
       if (err) throw err;
@@ -77,10 +79,13 @@ class BaseDataSessionLive {
   }
 
   addMessage(messageType, message) {
-    this.data.push(message);
+    const timestamp = new Date().getTime();
+    _.set(this.data, [messageType, `_${timestamp}`], message);
     this.buffer.push(message);
     // this.throttledUpdateStoreData();
-    this.throttledUpdateStoreCursor(message);
+    if (messageType === PACKETS.carTelemetry) {
+      this.throttledUpdateStoreCursor(message);
+    }
   }
 }
 
@@ -90,9 +95,16 @@ class DataSessionLive extends BaseDataSessionLive {
     this.name = 'live session';
     this.client = new F1TelemetryClient();
 
+    // this.client.on(PACKETS.session, message => this.addMessage(PACKETS.session, message));
+    // this.client.on(PACKETS.motion, message => this.addMessage(PACKETS.motion, message));
+    // this.client.on(PACKETS.lapData, message => this.addMessage(PACKETS.lapData, message));
+    // this.client.on(PACKETS.event, message => this.addMessage(PACKETS.event, message));
+    // this.client.on(PACKETS.participants, message => this.addMessage(PACKETS.participants, message));
+    // this.client.on(PACKETS.carSetups, message => this.addMessage(PACKETS.carSetups, message));
     this.client.on(PACKETS.carTelemetry, message =>
       this.addMessage(PACKETS.carTelemetry, message)
     );
+    // this.client.on(PACKETS.carStatus, message => this.addMessage(PACKETS.carStatus, message));
   }
 
   start() {

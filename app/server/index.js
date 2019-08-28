@@ -14,20 +14,23 @@ const history = getHistory('renderer');
 // IPC commands
 ipcRenderer.on(ipcConstants.COMMAND, (event, message) => {
   switch (message.command) {
-    case 'server:addsession': {
-      dataModel.addSession();
+    case 'server:addlivesession': {
+      dataModel.addLiveSession();
+      break;
+    }
+    case 'server:addhistoricsession': {
+      const { filepath } = message;
+      dataModel.addHistoricSession(filepath);
       break;
     }
     case 'server:start': {
       const { sessionId } = message;
-      const session = dataModel.getSession(sessionId);
-      session.start();
+      dataModel.startRecordingSession(sessionId);
       break;
     }
     case 'server:stop': {
       const { sessionId } = message;
-      const session = dataModel.getSession(sessionId);
-      session.stop();
+      dataModel.stopRecordingSession(sessionId);
       break;
     }
     case 'server:remove': {

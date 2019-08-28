@@ -9,14 +9,27 @@ import store from './store';
 
 const { PACKETS } = constants;
 
-class BaseDataSessionLive {
+class BaseDataSession {
   constructor() {
-    this.client = null;
-    this.data = [];
+    this.data = {};
     this.buffer = [];
     this.name = 'base';
     this.id = uuid();
     this.color = '#ff0000';
+  }
+}
+
+class DataSessionHistoric extends BaseDataSession {
+  constructor(data) {
+    super();
+    this.data = data;
+  }
+}
+
+class BaseDataSessionLive extends BaseDataSession {
+  constructor() {
+    super();
+    this.client = null;
     this.isRunning = false;
     this.throttledUpdateStoreData = _.throttle(this.updateStoreData, 200);
     this.throttledUpdateStoreCursor = _.throttle(this.updateStoreCursor, 50);
@@ -155,7 +168,8 @@ class DataSessionDebug extends BaseDataSessionLive {
 const DataSessionFactory = type =>
   ({
     live: DataSessionLive,
-    debug: DataSessionDebug
+    debug: DataSessionDebug,
+    historic: DataSessionHistoric
   }[type]);
 
 class DataModel {
@@ -167,9 +181,24 @@ class DataModel {
     return this.sessions[sessionId];
   }
 
-  addSession() {
-    const SessionFactory = DataSessionFactory('live');
+  addLiveSession(debug = false) {
+    const sessionType = debug ? 'debug' : 'live';
+    const SessionFactory = DataSessionFactory(sessionType);
     const session = new SessionFactory();
+
+    this.addSession(session);
+  }
+
+  addHistoricSession(filepath) {
+    const data = loadData(filepath);
+
+    const SessionFactory = DataSessionFactory('historic');
+    const session = new SessionFactory(data);
+
+    this.addSession(session);
+  }
+
+  addSession(session) {
     this.sessions[session.id] = session;
 
     const config = {
@@ -191,10 +220,25 @@ class DataModel {
     store.dispatch(removeSession(sessionId));
   }
 
+  startRecordingSession(sessionId) {
+    const session = this.getSession(sessionId);
+    session.start();
+  }
+
+  stopRecordingSession(sessionId) {
+    const session = this.getSession(sessionId);
+    session.stop();
+  }
+
   async downloadSession(sessionId) {
     const session = this.getSession(sessionId);
     session.downloadSession();
   }
+}
+
+function loadData(filepath) {
+  const rawdata = fs.readFileSync(filepath);
+  return JSON.parse(rawdata);
 }
 
 const dataModel = new DataModel();

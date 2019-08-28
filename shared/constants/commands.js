@@ -25,11 +25,21 @@ const commands = [
   },
   {
     category: 'Server',
-    name: 'Server: Add Live (Debug) Session',
+    name: 'Server: Add Live Session',
     command() {
       ipcRenderer.send(ipcConstants.COMMAND, {
-        command: 'server:addsession',
+        command: 'server:addlivesession',
         server_type: 'debug'
+      });
+    }
+  },
+  {
+    category: 'Server',
+    name: 'Server: Add Historic Session',
+    command() {
+      ipcRenderer.send(ipcConstants.COMMAND, {
+        command: 'server:addhistoricsession',
+        filepath: 'test.etx'
       });
     }
   }

@@ -23,8 +23,9 @@ class BaseDataSession {
 class DataSessionHistoric extends BaseDataSession {
   constructor(data) {
     super();
-    this.data = data;
+    this.name = 'historic session';
     this.sessionType = 'historic';
+    this.data = data;
   }
 }
 

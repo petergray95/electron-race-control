@@ -5,8 +5,8 @@ import type { Action } from './types';
 export default function sessions(state: object = {}, action: Action) {
   switch (action.type) {
     case ADD_SESSION: {
-      const { sessionId, name, color } = action.payload;
-      return { ...state, [sessionId]: { sessionId, name, color } };
+      const { sessionId, name, sessionType, color } = action.payload;
+      return { ...state, [sessionId]: { sessionId, name, sessionType, color } };
     }
     case REMOVE_SESSION: {
       const { sessionId } = action.payload;

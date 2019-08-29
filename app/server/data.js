@@ -16,6 +16,7 @@ class BaseDataSession {
     this.name = 'base';
     this.id = uuid();
     this.color = '#ff0000';
+    this.sessionType = 'base';
   }
 }
 
@@ -23,12 +24,14 @@ class DataSessionHistoric extends BaseDataSession {
   constructor(data) {
     super();
     this.data = data;
+    this.sessionType = 'historic';
   }
 }
 
 class BaseDataSessionLive extends BaseDataSession {
   constructor() {
     super();
+    this.sessionType = 'live';
     this.client = null;
     this.isRunning = false;
     this.throttledUpdateStoreData = _.throttle(this.updateStoreData, 200);
@@ -204,6 +207,7 @@ class DataModel {
     const config = {
       sessionId: session.id,
       name: session.name,
+      sessionType: session.sessionType,
       color: session.color
     };
 

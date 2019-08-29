@@ -12,17 +12,11 @@ type Props = {
   sessionCursorMeta: object
 };
 
-export default class Session extends Component<Props> {
+export default class SessionHistoric extends Component<Props> {
   props: Props;
 
   render() {
     const { session, sessionCursorMeta } = this.props;
-
-    const type = 'type';
-    const sessionId = 'id';
-    const name = 'name';
-    const color = '#ff0000';
-    const ipAddress = 'ip';
 
     const { lastRecord } = sessionCursorMeta;
     const lastRecordValid = lastRecord > 0;
@@ -31,15 +25,19 @@ export default class Session extends Component<Props> {
       <div className={styles.container}>
         <Form inverted onSubmit={this.handleSubmit}>
           <Header as="h1" inverted>
-            Data Server
+            Data Server [HISTORIC]
           </Header>
           <Form.Group widths="equal" inline>
-            <Form.Input fluid disabled label="Type" value={type} />
-            <Form.Input fluid disabled label="ID" value={sessionId} />
+            <Form.Input fluid label="Name" value={session.name} />
+            <Form.Input
+              fluid
+              disabled
+              label="Type"
+              value={session.sessionType}
+            />
+            <Form.Input fluid disabled label="ID" value={session.sessionId} />
           </Form.Group>
-          <Form.Input fluid label="Name" value={name} />
-          <Form.Input fluid label="Color" value={color} />
-          <Form.Input fluid label="IP Address" value={ipAddress} />
+          <Form.Input fluid label="Color" value={session.color} />
         </Form>
 
         <Form>
@@ -95,7 +93,11 @@ export default class Session extends Component<Props> {
 
         <Header as="h3" inverted>
           Last record:{' '}
-          { lastRecordValid ? (<Moment unix format='HH:mm:ss.SSS'>{lastRecord/1000}</Moment>) : null}
+          {lastRecordValid ? (
+            <Moment unix format="HH:mm:ss.SSS">
+              {lastRecord / 1000}
+            </Moment>
+          ) : null}
         </Header>
 
         <Header as="h3" inverted>

@@ -1,19 +1,20 @@
 // @flow
 import React, { Component } from 'react';
 import { Header, Tab } from 'semantic-ui-react';
-import SessionPage from '../containers/SessionPage';
+import SessionLivePage from '../containers/SessionLivePage';
+import SessionHistoricPage from '../containers/SessionHistoricPage';
 
 type Props = {
-  sessionIds: array
+  sessions: object
 };
 
 export default class Sessions extends Component<Props> {
   props: Props;
 
   render() {
-    const { sessionIds } = this.props;
+    const { sessions } = this.props;
 
-    if (sessionIds.length === 0) {
+    if (Object.keys(sessions).length === 0) {
       return (
         <Header as="h1" inverted>
           No servers or sessions loaded. Create a recorder or load a session to
@@ -24,12 +25,26 @@ export default class Sessions extends Component<Props> {
 
     const tabs = [];
 
-    sessionIds.forEach((sessionId, index) => {
+    Object.keys(sessions).forEach((sessionId, index) => {
+      const session = sessions[sessionId];
+      console.log(session.sessionType);
       const tab = {
         menuItem: `Session ${index + 1}`,
         render: () => (
           <Tab.Pane inverted attached={false}>
-            <SessionPage sessionId={sessionId} />
+            {(() => {
+              switch (session.sessionType) {
+                case 'live': {
+                  return <SessionLivePage session={session} />;
+                }
+                case 'historic': {
+                  return <SessionHistoricPage session={session} />;
+                }
+                default: {
+                  return null;
+                }
+              }
+            })()}
           </Tab.Pane>
         )
       };

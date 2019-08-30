@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import { Button } from 'semantic-ui-react';
 import Flexbox from 'flexbox-react';
 
 import styles from './BaseWidget.css';
@@ -69,14 +70,8 @@ export default class BaseWidget extends Component<Props> {
     this.setState({ isWidgetSettingsOpen: !isWidgetSettingsOpen });
   };
 
-  handleMouseHover = () => {
-    this.setState(this.toggleHoverState);
-  }
-
-  toggleHoverState(state) {
-    return {
-      isHovering: !state.isHovering,
-    };
+  handleMouseHover = (hoverState) => {
+    this.setState({isHovering: hoverState});
   }
 
   render() {
@@ -88,8 +83,8 @@ export default class BaseWidget extends Component<Props> {
         className={styles.container}
         flexDirection="column"
         minHeight="100%"
-        onMouseEnter={this.handleMouseHover}
-        onMouseLeave={this.handleMouseHover}
+        onMouseEnter={() => (this.handleMouseHover(true))}
+        onMouseLeave={() => (this.handleMouseHover(false))}
       >
         <Flexbox>
           <WidgetSettingsModal
@@ -110,13 +105,18 @@ export default class BaseWidget extends Component<Props> {
         <Flexbox flexDirection="column" flexGrow={1}>
           <Flexbox>
             <HeaderWidgetPage
-              handleSettingsToggle={this.handleSettingsToggle}
               sessionId={activeSessionId}
             />
           </Flexbox>
           <Flexbox flexGrow={1}>
             <NumericWidgetPage sessionId={activeSessionId} channel={channel} />
           </Flexbox>
+          {
+            isHovering &&
+            <Flexbox>
+              <Button icon='settings' onClick={this.handleSettingsToggle}/>
+            </Flexbox>
+          }
         </Flexbox>
       </Flexbox>
     );

@@ -117,7 +117,7 @@ export default class BaseWidget extends Component<Props> {
             <Flexbox flexDirection="row-reverse">
               <Button
                 inverted
-                circle
+                circular
                 icon="settings"
                 onClick={this.handleSettingsToggle}
               />

@@ -19,7 +19,7 @@ export default class SessionLive extends Component<Props> {
     const { session, sessionCursorMeta } = this.props;
 
     const { lastRecord } = sessionCursorMeta;
-    const lastRecordValid = lastRecord > 0;
+    const isLastRecordValid = lastRecord > 0;
 
     return (
       <div className={styles.container}>
@@ -95,7 +95,7 @@ export default class SessionLive extends Component<Props> {
         <Segment inverted color="grey">
           <Header as="h3" inverted>
             Last record:{' '}
-            {lastRecordValid ? (
+            {isLastRecordValid ? (
               <Moment unix format="HH:mm:ss.SSS">
                 {lastRecord / 1000}
               </Moment>

@@ -10,12 +10,12 @@ const TitleBarWidget = (props) => {
   const { sessions, title, activeSessionId, handleActiveSessionChange, onClose } = props;
   const options = [];
 
-  Object.keys(sessions).forEach(sessionId => {
+  Object.keys(sessions).forEach((sessionId, index) => {
     const session = sessions[sessionId];
 
     const row = {
       key: session.sessionId,
-      text: session.name,
+      text: `${index+1}: ${session.name}`,
       value: session.sessionId
     };
 

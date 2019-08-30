@@ -27,7 +27,6 @@ export default class Sessions extends Component<Props> {
 
     Object.keys(sessions).forEach((sessionId, index) => {
       const session = sessions[sessionId];
-      console.log(session.sessionType);
       const tab = {
         menuItem: `${index + 1}: ${session.name}`,
         render: () => (

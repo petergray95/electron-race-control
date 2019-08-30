@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import PropTypes from "prop-types";
-import { Dropdown } from 'semantic-ui-react';
+import { Dropdown, Icon } from 'semantic-ui-react';
 import Flexbox from 'flexbox-react';
 
 import styles from './TitleBarWidget.css';
@@ -29,7 +29,7 @@ const TitleBarWidget = (props) => {
       justifyContent="space-between"
       className={['titlebar', styles.titlebar].join(' ')}
     >
-      <Flexbox>{title}</Flexbox>
+      <Flexbox><Icon name="square" />{title}</Flexbox>
       <Flexbox>
         <Dropdown
           inline

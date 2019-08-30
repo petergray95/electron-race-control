@@ -13,7 +13,7 @@ class BaseDataSession {
   constructor() {
     this.data = {};
     this.buffer = [];
-    this.name = 'base';
+    this.name = 'Base';
     this.id = uuid();
     this.color = '#ff0000';
     this.sessionType = 'base';
@@ -23,7 +23,7 @@ class BaseDataSession {
 class DataSessionHistoric extends BaseDataSession {
   constructor(data) {
     super();
-    this.name = 'historic session';
+    this.name = 'Historic';
     this.sessionType = 'historic';
     this.data = data;
   }
@@ -109,7 +109,7 @@ class BaseDataSessionLive extends BaseDataSession {
 class DataSessionLive extends BaseDataSessionLive {
   constructor(opts) {
     super(opts);
-    this.name = 'live session';
+    this.name = 'Live';
     this.client = new F1TelemetryClient();
 
     // this.client.on(PACKETS.session, message => this.addMessage(PACKETS.session, message));
@@ -138,7 +138,7 @@ class DataSessionLive extends BaseDataSessionLive {
 class DataSessionDebug extends BaseDataSessionLive {
   constructor(opts) {
     super(opts);
-    this.name = 'debug session';
+    this.name = 'Debug';
     this.client = null;
   }
 

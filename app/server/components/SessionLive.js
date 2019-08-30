@@ -25,7 +25,7 @@ export default class SessionLive extends Component<Props> {
       <div className={styles.container}>
         <Form inverted onSubmit={this.handleSubmit}>
           <Header as="h1" inverted>
-            Data Server [LIVE]
+            Data Server [{session.sessionType.toUpperCase()}]
           </Header>
           <Header as="h3" inverted>
             Configuration
@@ -36,17 +36,18 @@ export default class SessionLive extends Component<Props> {
               fluid
               disabled
               label="Type"
-              value={session.sessionType}
+              value={session.sessionType.toUpperCase()}
             />
             <Form.Input fluid disabled label="ID" value={session.sessionId} />
           </Form.Group>
           <Form.Input fluid label="Color" value={session.color} />
         </Form>
 
-        <Segment inverted color="grey">
+        <Segment inverted>
           <Button
-            positive
+            inverted
             labelPosition="left"
+            color="green"
             icon="play"
             content="Start"
             onClick={() => {
@@ -57,8 +58,9 @@ export default class SessionLive extends Component<Props> {
             }}
           />
           <Button
-            negative
+            inverted
             labelPosition="left"
+            color="red"
             icon="stop"
             content="Stop"
             onClick={() => {
@@ -69,6 +71,8 @@ export default class SessionLive extends Component<Props> {
             }}
           />
           <Button
+            inverted
+            labelPosition="left"
             color="orange"
             content="Remove Session"
             icon="trash"
@@ -80,6 +84,8 @@ export default class SessionLive extends Component<Props> {
             }}
           />
           <Button
+            inverted
+            labelPosition="left"
             color="blue"
             content="Export Session"
             icon="download"
@@ -92,7 +98,7 @@ export default class SessionLive extends Component<Props> {
           />
         </Segment>
 
-        <Segment inverted color="grey">
+        <Segment inverted>
           <Header as="h3" inverted>
             Last record:{' '}
             {isLastRecordValid ? (

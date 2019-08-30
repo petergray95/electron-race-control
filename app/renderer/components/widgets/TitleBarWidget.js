@@ -15,7 +15,7 @@ const TitleBarWidget = (props) => {
 
     const row = {
       key: session.sessionId,
-      text: session.sessionId,
+      text: session.name,
       value: session.sessionId
     };
 

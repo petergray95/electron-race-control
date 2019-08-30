@@ -29,7 +29,7 @@ export default class Sessions extends Component<Props> {
       const session = sessions[sessionId];
       console.log(session.sessionType);
       const tab = {
-        menuItem: `Session ${index + 1}`,
+        menuItem: `${index + 1}: ${session.name}`,
         render: () => (
           <Tab.Pane inverted attached={false}>
             {(() => {

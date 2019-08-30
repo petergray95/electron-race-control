@@ -16,7 +16,9 @@ type Props = {
 
 type State = {
   activeSessionId: string,
-  channel: string
+  channel: string,
+  isWidgetSettingsOpen: boolean,
+  isHovering: boolean
 };
 
 export default class BaseWidget extends Component<Props> {
@@ -33,7 +35,8 @@ export default class BaseWidget extends Component<Props> {
         Object.keys(props.sessions).length > 0
           ? Object.values(props.sessions)[0].sessionId
           : '',
-      isWidgetSettingsOpen: false
+      isWidgetSettingsOpen: false,
+      isHovering: false
     };
   }
 
@@ -66,28 +69,43 @@ export default class BaseWidget extends Component<Props> {
     this.setState({ isWidgetSettingsOpen: !isWidgetSettingsOpen });
   };
 
+  handleMouseHover = () => {
+    this.setState(this.toggleHoverState);
+  }
+
+  toggleHoverState(state) {
+    return {
+      isHovering: !state.isHovering,
+    };
+  }
+
   render() {
     const { onClose, sessions } = this.props;
-    const { activeSessionId, channel, isWidgetSettingsOpen } = this.state;
+    const { activeSessionId, channel, isWidgetSettingsOpen, isHovering } = this.state;
 
     return (
       <Flexbox
         className={styles.container}
         flexDirection="column"
         minHeight="100%"
+        onMouseEnter={this.handleMouseHover}
+        onMouseLeave={this.handleMouseHover}
       >
         <Flexbox>
           <WidgetSettingsModal
             handleSettingsToggle={this.handleSettingsToggle}
             isOpen={isWidgetSettingsOpen}
           />
-          <TitleBarWidgetPage
-            title="Numeric Widget"
-            sessions={sessions}
-            onClose={onClose}
-            activeSessionId={activeSessionId}
-            handleActiveSessionChange={this.handleActiveSessionChange}
-          />
+          {
+            isHovering &&
+            <TitleBarWidgetPage
+              title="Numeric Widget"
+              sessions={sessions}
+              onClose={onClose}
+              activeSessionId={activeSessionId}
+              handleActiveSessionChange={this.handleActiveSessionChange}
+            />
+          }
         </Flexbox>
         <Flexbox flexDirection="column" flexGrow={1}>
           <Flexbox>

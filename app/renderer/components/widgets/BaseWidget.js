@@ -70,29 +70,33 @@ export default class BaseWidget extends Component<Props> {
     this.setState({ isWidgetSettingsOpen: !isWidgetSettingsOpen });
   };
 
-  handleMouseHover = (hoverState) => {
-    this.setState({isHovering: hoverState});
-  }
+  handleMouseHover = hoverState => {
+    this.setState({ isHovering: hoverState });
+  };
 
   render() {
     const { onClose, sessions } = this.props;
-    const { activeSessionId, channel, isWidgetSettingsOpen, isHovering } = this.state;
+    const {
+      activeSessionId,
+      channel,
+      isWidgetSettingsOpen,
+      isHovering
+    } = this.state;
 
     return (
       <Flexbox
         className={styles.container}
         flexDirection="column"
         minHeight="100%"
-        onMouseEnter={() => (this.handleMouseHover(true))}
-        onMouseLeave={() => (this.handleMouseHover(false))}
+        onMouseEnter={() => this.handleMouseHover(true)}
+        onMouseLeave={() => this.handleMouseHover(false)}
       >
         <Flexbox>
           <WidgetSettingsModal
             handleSettingsToggle={this.handleSettingsToggle}
             isOpen={isWidgetSettingsOpen}
           />
-          {
-            isHovering &&
+          {isHovering && (
             <TitleBarWidgetPage
               title="Numeric Widget"
               sessions={sessions}
@@ -100,23 +104,25 @@ export default class BaseWidget extends Component<Props> {
               activeSessionId={activeSessionId}
               handleActiveSessionChange={this.handleActiveSessionChange}
             />
-          }
+          )}
         </Flexbox>
         <Flexbox flexDirection="column" flexGrow={1}>
           <Flexbox>
-            <HeaderWidgetPage
-              sessionId={activeSessionId}
-            />
+            <HeaderWidgetPage sessionId={activeSessionId} />
           </Flexbox>
           <Flexbox flexGrow={1}>
             <NumericWidgetPage sessionId={activeSessionId} channel={channel} />
           </Flexbox>
-          {
-            isHovering &&
-            <Flexbox>
-              <Button icon='settings' onClick={this.handleSettingsToggle}/>
+          {isHovering && (
+            <Flexbox flexDirection="row-reverse">
+              <Button
+                inverted
+                circle
+                icon="settings"
+                onClick={this.handleSettingsToggle}
+              />
             </Flexbox>
-          }
+          )}
         </Flexbox>
       </Flexbox>
     );

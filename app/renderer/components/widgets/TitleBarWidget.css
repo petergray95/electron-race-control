@@ -1,4 +1,5 @@
 .titlebar {
+  cursor: move;
   background-color: #454545;
   user-select: none;
 }

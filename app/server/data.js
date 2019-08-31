@@ -3,7 +3,11 @@ import { v4 as uuid } from 'uuid';
 import fs from 'fs';
 import { F1TelemetryClient, constants } from 'f1-telemetry-client';
 import { updateData } from '../../shared/actions/data';
-import { addSession, removeSession } from '../../shared/actions/sessions';
+import {
+  addSession,
+  updateSession,
+  removeSession
+} from '../../shared/actions/sessions';
 import { updateCursor } from '../../shared/actions/cursor';
 import store from './store';
 
@@ -17,6 +21,19 @@ class BaseDataSession {
     this.id = uuid();
     this.color = '#ff0000';
     this.sessionType = 'base';
+  }
+
+  getStoreConfig() {
+    return {
+      sessionId: this.id,
+      name: this.name,
+      sessionType: this.sessionType,
+      color: this.color
+    };
+  }
+
+  rename(name) {
+    this.name = name;
   }
 }
 
@@ -205,12 +222,7 @@ class DataModel {
   addSession(session) {
     this.sessions[session.id] = session;
 
-    const config = {
-      sessionId: session.id,
-      name: session.name,
-      sessionType: session.sessionType,
-      color: session.color
-    };
+    const config = session.getStoreConfig();
 
     store.dispatch(addSession(config));
   }
@@ -238,6 +250,13 @@ class DataModel {
   async downloadSession(sessionId) {
     const session = this.getSession(sessionId);
     session.downloadSession();
+  }
+
+  renameSession(sessionId, value) {
+    const session = this.getSession(sessionId);
+    session.rename(value);
+    const config = session.getStoreConfig();
+    store.dispatch(updateSession(config));
   }
 }
 

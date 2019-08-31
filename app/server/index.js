@@ -43,6 +43,11 @@ ipcRenderer.on(ipcConstants.COMMAND, (event, message) => {
       dataModel.downloadSession(sessionId);
       break;
     }
+    case 'server:rename': {
+      const { sessionId, value } = message;
+      dataModel.renameSession(sessionId, value);
+      break;
+    }
     default: {
       break;
     }

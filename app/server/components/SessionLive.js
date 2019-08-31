@@ -31,12 +31,23 @@ export default class SessionLive extends Component<Props> {
             Configuration
           </Header>
           <Form.Group widths="equal" inline>
-            <Form.Input fluid label="Name" value={session.name} />
+            <Form.Input
+              fluid
+              onChange={(event, data) => {
+                ipcRenderer.send(ipcConstants.COMMAND, {
+                  command: 'server:rename',
+                  sessionId: session.sessionId,
+                  value: data.value
+                });
+              }}
+              label="Name"
+              placeholder={session.name}
+            />
             <Form.Input
               fluid
               disabled
               label="Type"
-              value={session.sessionType.toUpperCase()}
+              placeholder={session.sessionType.toUpperCase()}
             />
             <Form.Input fluid disabled label="ID" value={session.sessionId} />
           </Form.Group>

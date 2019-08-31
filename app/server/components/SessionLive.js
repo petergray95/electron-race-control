@@ -41,13 +41,13 @@ export default class SessionLive extends Component<Props> {
                 });
               }}
               label="Name"
-              placeholder={session.name}
+              value={session.name}
             />
             <Form.Input
               fluid
               disabled
               label="Type"
-              placeholder={session.sessionType.toUpperCase()}
+              value={session.sessionType.toUpperCase()}
             />
             <Form.Input fluid disabled label="ID" value={session.sessionId} />
           </Form.Group>

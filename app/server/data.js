@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 import fs from 'fs';
+import zlib from 'zlib';
 import { F1TelemetryClient, constants } from 'f1-telemetry-client';
 import { updateData } from '../../shared/actions/data';
 import {
@@ -34,6 +35,24 @@ class BaseDataSession {
 
   rename(name) {
     this.name = name;
+  }
+
+  downloadSession() {
+    const filename = 'test_buffer.etx';
+    const blob = {
+      header: {
+        name: this.name
+      },
+      data: { ...this.data }
+    };
+
+    zlib.deflate(JSON.stringify(blob), (err, buffer) => {
+      if (err) {
+        console.log('Error writing file: ', err);
+      }
+
+      fs.writeFile(filename, buffer);
+    });
   }
 }
 
@@ -84,22 +103,6 @@ class BaseDataSessionLive extends BaseDataSession {
       }
     };
     store.dispatch(updateCursor(cursor));
-  }
-
-  downloadSession() {
-    const filename = 'test.etx';
-    const blob = {
-      header: {
-        name: this.name
-      },
-      data: { ...this.data }
-    };
-
-    console.log(this.data, JSON.stringify(blob));
-
-    fs.writeFile(filename, JSON.stringify(blob), err => {
-      if (err) throw err;
-    });
   }
 
   start() {
@@ -261,8 +264,11 @@ class DataModel {
 }
 
 function loadData(filepath) {
-  const rawdata = fs.readFileSync(filepath);
-  return JSON.parse(rawdata);
+  const input = fs.readFileSync(filepath);
+
+  const rawData = zlib.inflateSync(input);
+
+  return JSON.parse(rawData);
 }
 
 const dataModel = new DataModel();

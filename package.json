@@ -270,7 +270,8 @@
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-react": "^0.87.3",
     "source-map-support": "^0.5.9",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "zlib": "^1.0.5"
   },
   "devEngines": {
     "node": ">=7.x",

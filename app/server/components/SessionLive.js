@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
-import { Header, Form, Segment, Button } from 'semantic-ui-react';
+import { Header, Form, Message, Segment, Button } from 'semantic-ui-react';
+import { CirclePicker } from 'react-color';
 import { ipcRenderer } from 'electron-better-ipc';
 import Moment from 'react-moment';
 import ipcConstants from '../../../shared/constants/ipc-channels';
@@ -15,29 +16,61 @@ type Props = {
 export default class SessionLive extends Component<Props> {
   props: Props;
 
+  isSessionConfigValid() {
+    const { session } = this.props;
+
+    if (session.name.length === 0) {
+      return false;
+    }
+
+    return true;
+  }
+
+  handleColorChange(data) {
+    const { session } = this.props;
+
+    ipcRenderer.send(ipcConstants.COMMAND, {
+      command: 'server:set_session_color',
+      sessionId: session.sessionId,
+      color: data.hex
+    });
+  }
+
   render() {
     const { session, sessionCursorMeta } = this.props;
+
+    console.log(session.color);
 
     const { lastRecord } = sessionCursorMeta;
     const isLastRecordValid = lastRecord > 0;
 
     return (
       <div className={styles.container}>
-        <Form inverted onSubmit={this.handleSubmit}>
+        <Form
+          error={!this.isSessionConfigValid()}
+          inverted
+          onSubmit={this.handleSubmit}
+        >
           <Header as="h1" inverted>
             Data Server [{session.sessionType.toUpperCase()}]
           </Header>
           <Header as="h3" inverted>
             Configuration
           </Header>
+          <Message
+            error
+            header="Invalid configuration"
+            content="Session name can not be empty"
+          />
           <Form.Group widths="equal" inline>
             <Form.Input
               fluid
+              required
               onChange={(event, data) => {
                 ipcRenderer.send(ipcConstants.COMMAND, {
-                  command: 'server:rename',
+                  command: 'server:set_session_name',
                   sessionId: session.sessionId,
-                  value: data.value
+                  name: data.value
                 });
               }}
               label="Name"
@@ -51,7 +84,10 @@ export default class SessionLive extends Component<Props> {
             />
             <Form.Input fluid disabled label="ID" value={session.sessionId} />
           </Form.Group>
-          <Form.Input fluid label="Color" value={session.color} />
+          <CirclePicker
+            color={session.color}
+            onChangeComplete={this.handleColorChange}
+          />
         </Form>
 
         <Segment inverted>

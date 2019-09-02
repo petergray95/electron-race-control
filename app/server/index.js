@@ -43,9 +43,14 @@ ipcRenderer.on(ipcConstants.COMMAND, (event, message) => {
       dataModel.downloadSession(sessionId);
       break;
     }
-    case 'server:rename': {
-      const { sessionId, value } = message;
-      dataModel.renameSession(sessionId, value);
+    case 'server:set_session_name': {
+      const { sessionId, name } = message;
+      dataModel.setSessionName(sessionId, name);
+      break;
+    }
+    case 'server:set_session_color': {
+      const { sessionId, color } = message;
+      dataModel.setSessionColor(sessionId, color);
       break;
     }
     default: {

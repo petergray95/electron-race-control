@@ -20,7 +20,7 @@ class BaseDataSession {
     this.buffer = [];
     this.name = 'Base';
     this.id = uuid();
-    this.color = '#ff0000';
+    this.color = '#f44336';
     this.sessionType = 'base';
   }
 
@@ -33,8 +33,12 @@ class BaseDataSession {
     };
   }
 
-  rename(name) {
+  setName(name) {
     this.name = name;
+  }
+
+  setColor(color) {
+    this.color = color;
   }
 
   downloadSession() {
@@ -46,12 +50,14 @@ class BaseDataSession {
       data: { ...this.data }
     };
 
-    zlib.deflate(JSON.stringify(blob), (err, buffer) => {
-      if (err) {
-        console.log('Error writing file: ', err);
+    zlib.deflate(JSON.stringify(blob), (deflateErr, buffer) => {
+      if (!deflateErr) {
+        fs.writeFile(filename, buffer, writeErr => {
+          if (writeErr) {
+            console.log(writeErr);
+          }
+        });
       }
-
-      fs.writeFile(filename, buffer);
     });
   }
 }
@@ -116,9 +122,10 @@ class BaseDataSessionLive extends BaseDataSession {
   }
 
   addMessage(messageType, message) {
-    const timestamp = new Date().getTime();
-    _.set(this.data, [messageType, `_${timestamp}`], message);
-    this.buffer.push(message);
+    // const timestamp = new Date().getTime();
+    // this.data[messageType].push(message);
+
+    // _.set(this.data, [messageType, `_${timestamp}`], message);
     // this.throttledUpdateStoreData();
     if (messageType === PACKETS.carTelemetry) {
       this.throttledUpdateStoreCursor(message);
@@ -132,16 +139,30 @@ class DataSessionLive extends BaseDataSessionLive {
     this.name = 'Live';
     this.client = new F1TelemetryClient();
 
-    // this.client.on(PACKETS.session, message => this.addMessage(PACKETS.session, message));
-    // this.client.on(PACKETS.motion, message => this.addMessage(PACKETS.motion, message));
-    // this.client.on(PACKETS.lapData, message => this.addMessage(PACKETS.lapData, message));
-    // this.client.on(PACKETS.event, message => this.addMessage(PACKETS.event, message));
-    // this.client.on(PACKETS.participants, message => this.addMessage(PACKETS.participants, message));
-    // this.client.on(PACKETS.carSetups, message => this.addMessage(PACKETS.carSetups, message));
+    this.client.on(PACKETS.session, message =>
+      this.addMessage(PACKETS.session, message)
+    );
+    this.client.on(PACKETS.motion, message =>
+      this.addMessage(PACKETS.motion, message)
+    );
+    this.client.on(PACKETS.lapData, message =>
+      this.addMessage(PACKETS.lapData, message)
+    );
+    this.client.on(PACKETS.event, message =>
+      this.addMessage(PACKETS.event, message)
+    );
+    this.client.on(PACKETS.participants, message =>
+      this.addMessage(PACKETS.participants, message)
+    );
+    this.client.on(PACKETS.carSetups, message =>
+      this.addMessage(PACKETS.carSetups, message)
+    );
     this.client.on(PACKETS.carTelemetry, message =>
       this.addMessage(PACKETS.carTelemetry, message)
     );
-    // this.client.on(PACKETS.carStatus, message => this.addMessage(PACKETS.carStatus, message));
+    this.client.on(PACKETS.carStatus, message =>
+      this.addMessage(PACKETS.carStatus, message)
+    );
   }
 
   start() {
@@ -215,6 +236,7 @@ class DataModel {
 
   addHistoricSession(filepath) {
     const data = loadData(filepath);
+    console.log(data);
 
     const SessionFactory = DataSessionFactory('historic');
     const session = new SessionFactory(data);
@@ -255,9 +277,16 @@ class DataModel {
     session.downloadSession();
   }
 
-  renameSession(sessionId, value) {
+  setSessionName(sessionId, name) {
     const session = this.getSession(sessionId);
-    session.rename(value);
+    session.setName(name);
+    const config = session.getStoreConfig();
+    store.dispatch(updateSession(config));
+  }
+
+  setSessionColor(sessionId, color) {
+    const session = this.getSession(sessionId);
+    session.setColor(color);
     const config = session.getStoreConfig();
     store.dispatch(updateSession(config));
   }

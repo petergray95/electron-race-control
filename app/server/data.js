@@ -2,7 +2,8 @@ import _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 import fs from 'fs';
 import zlib from 'zlib';
-import { F1TelemetryClient, constants } from 'f1-telemetry-client';
+// import { F1TelemetryClient, constants } from 'f1-telemetry-client';
+import F1Client from './client/telemetry';
 import { updateData } from '../../shared/actions/data';
 import {
   addSession,
@@ -12,7 +13,7 @@ import {
 import { updateCursor } from '../../shared/actions/cursor';
 import store from './store';
 
-const { PACKETS } = constants;
+// const { PACKETS } = constants;
 
 class BaseDataSession {
   constructor() {
@@ -105,7 +106,7 @@ class BaseDataSessionLive extends BaseDataSession {
       meta: {
         timestamp: new Date().getTime(),
         numberRecords: this.data.length,
-        lastRecord: message.timestamp
+        lastRecord: message
       }
     };
     store.dispatch(updateCursor(cursor));
@@ -122,14 +123,18 @@ class BaseDataSessionLive extends BaseDataSession {
   }
 
   addMessage(messageType, message) {
-    // const timestamp = new Date().getTime();
+    const timestamp = new Date().getTime();
+
+    this.throttledUpdateStoreCursor(timestamp);
+    // console.log(message);
+    //
     // this.data[messageType].push(message);
 
-    // _.set(this.data, [messageType, `_${timestamp}`], message);
+    _.set(this.data, [messageType, `_${timestamp}`], message);
     // this.throttledUpdateStoreData();
-    if (messageType === PACKETS.carTelemetry) {
-      this.throttledUpdateStoreCursor(message);
-    }
+    // this.throttledUpdateStoreCursor(message);
+    // if (messageType === PACKETS.carTelemetry) {
+    // }
   }
 }
 
@@ -137,32 +142,34 @@ class DataSessionLive extends BaseDataSessionLive {
   constructor(opts) {
     super(opts);
     this.name = 'Live';
-    this.client = new F1TelemetryClient();
-
-    this.client.on(PACKETS.session, message =>
-      this.addMessage(PACKETS.session, message)
-    );
-    this.client.on(PACKETS.motion, message =>
-      this.addMessage(PACKETS.motion, message)
-    );
-    this.client.on(PACKETS.lapData, message =>
-      this.addMessage(PACKETS.lapData, message)
-    );
-    this.client.on(PACKETS.event, message =>
-      this.addMessage(PACKETS.event, message)
-    );
-    this.client.on(PACKETS.participants, message =>
-      this.addMessage(PACKETS.participants, message)
-    );
-    this.client.on(PACKETS.carSetups, message =>
-      this.addMessage(PACKETS.carSetups, message)
-    );
-    this.client.on(PACKETS.carTelemetry, message =>
-      this.addMessage(PACKETS.carTelemetry, message)
-    );
-    this.client.on(PACKETS.carStatus, message =>
-      this.addMessage(PACKETS.carStatus, message)
-    );
+    this.client = new F1Client(20777);
+    this.client.on('DATA', message => this.addMessage('DATA', message));
+    // this.client = new F1TelemetryClient();
+    //
+    // this.client.on(PACKETS.session, message =>
+    //   this.addMessage(PACKETS.session, message)
+    // );
+    // this.client.on(PACKETS.motion, message =>
+    //   this.addMessage(PACKETS.motion, message)
+    // );
+    // this.client.on(PACKETS.lapData, message =>
+    //   this.addMessage(PACKETS.lapData, message)
+    // );
+    // this.client.on(PACKETS.event, message =>
+    //   this.addMessage(PACKETS.event, message)
+    // );
+    // this.client.on(PACKETS.participants, message =>
+    //   this.addMessage(PACKETS.participants, message)
+    // );
+    // this.client.on(PACKETS.carSetups, message =>
+    //   this.addMessage(PACKETS.carSetups, message)
+    // );
+    // this.client.on(PACKETS.carTelemetry, message =>
+    //   this.addMessage(PACKETS.carTelemetry, message)
+    // );
+    // this.client.on(PACKETS.carStatus, message =>
+    //   this.addMessage(PACKETS.carStatus, message)
+    // );
   }
 
   start() {
@@ -197,7 +204,7 @@ class DataSessionDebug extends BaseDataSessionLive {
         const key = `${i}`;
         message[key] = Math.random();
       });
-      this.addMessage(PACKETS.carTelemetry, message);
+      // this.addMessage(PACKETS.carTelemetry, message);
     }, 20);
 
     this.isRunning = true;

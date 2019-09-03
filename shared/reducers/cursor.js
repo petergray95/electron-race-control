@@ -21,12 +21,13 @@ const getPlayerIndex = (state, sessionId) =>
     null
   );
 
-const getCursorValue = (state, sessionId, playerIndex, channel) =>
-  _.get(
-    state,
-    ['cursor', sessionId, 'values', 'm_carTelemetryData', playerIndex, channel],
-    null
-  );
+const getCursorValue = (state, sessionId) =>
+  _.get(state, ['cursor', sessionId, 'values'], null);
+// _.get(
+//   state,
+//   ['cursor', sessionId, 'values', 'm_carTelemetryData', playerIndex, channel],
+//   null
+// );
 
 const getCursorTimestamp = (state, sessionId) =>
   _.get(state, ['cursor', sessionId, 'meta', 'timestamp'], 0);

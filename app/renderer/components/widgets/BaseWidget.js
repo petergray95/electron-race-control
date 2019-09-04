@@ -74,6 +74,10 @@ export default class BaseWidget extends Component<Props> {
     this.setState({ isHovering: hoverState });
   };
 
+  handleSetChannelName = (event, data) => {
+    this.setState({ channel: data.value });
+  };
+
   render() {
     const { onClose, sessions } = this.props;
     const {
@@ -94,11 +98,13 @@ export default class BaseWidget extends Component<Props> {
         <Flexbox>
           <WidgetSettingsModal
             handleSettingsToggle={this.handleSettingsToggle}
+            handleSetChannelName={this.handleSetChannelName}
             isOpen={isWidgetSettingsOpen}
+            channel={channel}
           />
           {isHovering && (
             <TitleBarWidgetPage
-              title="Numeric Widget"
+              title={`Numeric - ${channel}`}
               sessions={sessions}
               onClose={onClose}
               activeSessionId={activeSessionId}

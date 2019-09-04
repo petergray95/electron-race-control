@@ -50,7 +50,7 @@ export default class F1Client extends EventEmitter {
 
   parseMessage(message) {
     this.data.push(message);
-    this.gzip.write(message);
+    this.gzip.write(message.toJSON());
     this.emit('DATA', message);
   }
 }

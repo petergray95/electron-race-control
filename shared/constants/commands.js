@@ -39,7 +39,7 @@ const commands = [
     command() {
       ipcRenderer.send(ipcConstants.COMMAND, {
         command: 'server:addhistoricsession',
-        filepath: 'test_buffer.etx'
+        filepath: './TEST_DATA/raw_buffer.etx'
       });
     }
   }

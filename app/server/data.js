@@ -300,11 +300,24 @@ class DataModel {
 }
 
 function loadData(filepath) {
-  const input = fs.readFileSync(filepath);
+  const buffer = fs.readFileSync(filepath);
+  console.log(buffer);
+  // const input = fs.createReadStream(filepath);
+  //
+  // input
+  //   .on('data', function (chunk) {
+  //     console.log(chunk);
+  //   })
+  //   .on('end', function () {
+  //     console.log('done');
+  //   });
 
-  const rawData = zlib.inflateSync(input);
+  return {};
 
-  return JSON.parse(rawData);
+  //
+  // const rawData = zlib.inflateSync(input);
+  //
+  // return JSON.parse(rawData);
 }
 
 const dataModel = new DataModel();

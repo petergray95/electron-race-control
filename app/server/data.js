@@ -126,22 +126,31 @@ class BaseDataSessionLive extends BaseDataSession {
     const start = performance.now();
 
     const timestamp = new Date().getTime();
+    const timestampRound = Math.round(timestamp / 10000) * 10000;
 
     const messageFlat = flatten(message);
 
     Object.entries(messageFlat).forEach(([key, value]) => {
-      const data = _.get(this.data, [messageType, key], []);
+      const data = _.get(
+        this.data,
+        [messageType, `_${timestampRound}`, key],
+        []
+      );
       data.push(value);
-      _.set(this.data, [messageType, key], data);
+      _.set(this.data, [messageType, `_${timestampRound}`, key], data);
     });
 
-    const times = _.get(this.data, [messageType, 'times'], []);
+    const times = _.get(
+      this.data,
+      [messageType, `_${timestampRound}`, 'times'],
+      []
+    );
     times.push(timestamp);
-    _.set(this.data, [messageType, 'times'], times);
+    _.set(this.data, [messageType, `_${timestampRound}`, 'times'], times);
 
     const duration = performance.now() - start;
 
-    this.throttledUpdateStoreCursor(duration);
+    this.throttledUpdateStoreCursor(duration.toFixed(2));
   }
 }
 

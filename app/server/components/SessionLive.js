@@ -39,8 +39,6 @@ export default class SessionLive extends Component<Props> {
   render() {
     const { session, sessionCursorMeta } = this.props;
 
-    console.log(session.color);
-
     const { lastRecord } = sessionCursorMeta;
     const isLastRecordValid = lastRecord > 0;
 

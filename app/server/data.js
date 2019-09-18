@@ -42,6 +42,20 @@ class BaseDataSession {
     this.color = color;
   }
 
+  setData(data) {
+    this.data = data;
+    console.log(this.data);
+  }
+
+  loadData(filepath) {
+    fs.readFile(filepath, (fsErr, data) => {
+      zlib.inflate(data, (zlibErr, result) => {
+        const parsedData = JSON.parse(result);
+        this.setData(parsedData);
+      });
+    });
+  }
+
   downloadSession() {
     const filename = 'export.etx';
     const blob = {
@@ -64,11 +78,10 @@ class BaseDataSession {
 }
 
 class DataSessionHistoric extends BaseDataSession {
-  constructor(data) {
+  constructor() {
     super();
     this.name = 'Historic';
     this.sessionType = 'historic';
-    this.data = data;
   }
 }
 
@@ -220,11 +233,9 @@ class DataModel {
   }
 
   addHistoricSession(filepath) {
-    const data = loadData(filepath);
-    console.log(data);
-
     const SessionFactory = DataSessionFactory('historic');
-    const session = new SessionFactory(data);
+    const session = new SessionFactory();
+    session.loadData(filepath);
 
     this.addSession(session);
   }
@@ -275,14 +286,6 @@ class DataModel {
     const config = session.getStoreConfig();
     store.dispatch(updateSession(config));
   }
-}
-
-function loadData(filepath) {
-  const input = fs.readFileSync(filepath);
-
-  const rawData = zlib.inflateSync(input);
-
-  return JSON.parse(rawData);
 }
 
 const dataModel = new DataModel();

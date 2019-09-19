@@ -53,7 +53,6 @@ class BaseDataSession {
     const laps = [];
 
     const lapData = _.get(this.data, ['data', 'lapData'], {});
-    console.log(lapData);
 
     let currentLapNum = null;
     let currentLapStart = null;
@@ -106,7 +105,7 @@ class BaseDataSession {
       });
     });
     const duration = performance.now() - start;
-    console.log('retrieving lap information: ', duration);
+    console.log('retrieving lap information: ', duration, laps);
   }
 
   loadData(filepath) {
@@ -201,7 +200,7 @@ class BaseDataSessionLive extends BaseDataSession {
     const start = performance.now();
 
     const timestamp = new Date().getTime();
-    const timestampRound = Math.round(timestamp / 10000) * 10000;
+    const timestampRound = Math.floor(timestamp / 10000) * 10000;
 
     const messageFlat = flatten(message);
 

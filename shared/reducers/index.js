@@ -4,6 +4,7 @@ import { connectRouter } from 'connected-react-router';
 import cursor from './cursor';
 import data from './data';
 import sessions from './sessions';
+import laps from './laps';
 
 export default function createRootReducer(
   history: History,
@@ -13,6 +14,7 @@ export default function createRootReducer(
     ...(scope === 'renderer' && { router: connectRouter(history) }),
     cursor,
     data,
-    sessions
+    sessions,
+    laps
   });
 }

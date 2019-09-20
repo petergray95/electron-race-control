@@ -10,6 +10,7 @@ import {
   updateSession,
   removeSession
 } from '../../shared/actions/sessions';
+import { addLap } from '../../shared/actions/laps';
 import { updateCursor } from '../../shared/actions/cursor';
 import store from './store';
 
@@ -106,6 +107,10 @@ class BaseDataSession {
     });
     const duration = performance.now() - start;
     console.log('retrieving lap information: ', duration, laps);
+
+    laps.forEach(lap => {
+      store.dispatch(addLap(this.id, lap));
+    });
   }
 
   loadData(filepath) {

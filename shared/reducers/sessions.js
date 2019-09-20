@@ -54,7 +54,7 @@ export default combineReducers({
   allIds: allSessions
 });
 
-const getSessionIds = state => Object.keys(state.sessions.allIds);
+const getSessionIds = state => state.sessions.allIds;
 
 const getSessions = state => state.sessions.byId;
 

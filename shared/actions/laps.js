@@ -4,9 +4,9 @@
 export const ADD_LAP = 'ADD_LAP';
 export const REMOVE_LAP = 'REMOVE_LAP';
 
-export function addLap(sessionId, lap) {
+export function addLap(sessionId, lapId, lap) {
   return {
     type: ADD_LAP,
-    payload: { sessionId, lap }
+    payload: { sessionId, lapId, lap }
   };
 }

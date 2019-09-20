@@ -76,6 +76,8 @@ class BaseDataSession {
 
         if (timestampLapNum !== currentLapNum) {
           const lap = {
+            id: uuid(),
+            sessionId: this.id,
             startTime: currentLapStart,
             number: currentLapNum,
             endTime: timestamps[timestampIndex - 1],
@@ -94,6 +96,8 @@ class BaseDataSession {
           timestampGroupIndex + 1 === Object.keys(lapData).length
         ) {
           const lap = {
+            id: uuid(),
+            sessionId: this.id,
             startTime: currentLapStart,
             number: currentLapNum,
             endTime: timestamps[timestampIndex - 1],
@@ -109,7 +113,7 @@ class BaseDataSession {
     console.log('retrieving lap information: ', duration, laps);
 
     laps.forEach(lap => {
-      store.dispatch(addLap(this.id, lap));
+      store.dispatch(addLap(this.id, lap.id, lap));
     });
   }
 
@@ -309,9 +313,9 @@ class DataModel {
   addSession(session) {
     this.sessions[session.id] = session;
 
-    const config = session.getStoreConfig();
+    const sessionConfig = session.getStoreConfig();
 
-    store.dispatch(addSession(config));
+    store.dispatch(addSession(session.id, sessionConfig));
   }
 
   removeSession(sessionId) {
@@ -342,15 +346,15 @@ class DataModel {
   setSessionName(sessionId, name) {
     const session = this.getSession(sessionId);
     session.setName(name);
-    const config = session.getStoreConfig();
-    store.dispatch(updateSession(config));
+    const sessionConfig = session.getStoreConfig();
+    store.dispatch(updateSession(sessionConfig));
   }
 
   setSessionColor(sessionId, color) {
     const session = this.getSession(sessionId);
     session.setColor(color);
-    const config = session.getStoreConfig();
-    store.dispatch(updateSession(config));
+    const sessionConfig = session.getStoreConfig();
+    store.dispatch(updateSession(sessionConfig));
   }
 }
 

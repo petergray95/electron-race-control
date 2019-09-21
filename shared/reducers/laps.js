@@ -5,11 +5,11 @@ import type { Action } from './types';
 
 function addLapEntry(state, action) {
   const { payload } = action;
-  const { lapId, lap } = payload;
+  const { lapId, lapConfig } = payload;
 
   return {
     ...state,
-    [lapId]: lap
+    [lapId]: lapConfig
   };
 }
 

@@ -3,14 +3,13 @@ import React, { Component } from 'react';
 import { Header, Form, Message, Segment, Button } from 'semantic-ui-react';
 import { CirclePicker } from 'react-color';
 import { ipcRenderer } from 'electron-better-ipc';
-import Moment from 'react-moment';
 import ipcConstants from '../../../shared/constants/ipc-channels';
 
 import styles from './Session.css';
 
 type Props = {
   session: object,
-  sessionCursorMeta: object
+  laps: object
 };
 
 export default class SessionLive extends Component<Props> {
@@ -37,10 +36,7 @@ export default class SessionLive extends Component<Props> {
   }
 
   render() {
-    const { session, sessionCursorMeta } = this.props;
-
-    const { lastRecord } = sessionCursorMeta;
-    const isLastRecordValid = lastRecord > 0;
+    const { session, laps } = this.props;
 
     return (
       <div className={styles.container}>
@@ -145,16 +141,7 @@ export default class SessionLive extends Component<Props> {
 
         <Segment inverted>
           <Header as="h3" inverted>
-            Last record:{' '}
-            {isLastRecordValid ? (
-              <Moment unix format="HH:mm:ss.SSS">
-                {lastRecord / 1000}
-              </Moment>
-            ) : null}
-          </Header>
-
-          <Header as="h3" inverted>
-            Number of records: {sessionCursorMeta.numberRecords}
+            Laps: {laps}
           </Header>
         </Segment>
       </div>

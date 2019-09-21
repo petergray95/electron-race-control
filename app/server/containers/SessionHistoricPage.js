@@ -1,11 +1,16 @@
 import { connect } from 'react-redux';
 import SessionHistoric from '../components/SessionHistoric';
-import { getCursorMeta } from '../../../shared/reducers/cursor';
+import { makeGetSessionState } from '../../../shared/selectors/sessions';
+import { makeGetLapsState } from '../../../shared/selectors/laps';
 
-function mapStateToProps(state, props) {
-  return {
-    sessionCursorMeta: getCursorMeta(state, props.session.sessionId)
-  };
+const makeMapStateToProps = () => {
+  const getLapsState = makeGetLapsState();
+  const getSessionState = makeGetSessionState();
+  const mapStateToProps = (state, props) => ({
+    laps: getLapsState(state, props),
+    session: getSessionState(state, props)
+  })
+  return mapStateToProps
 }
 
-export default connect(mapStateToProps)(SessionHistoric);
+export default connect(makeMapStateToProps)(SessionHistoric)

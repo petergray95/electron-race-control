@@ -8,14 +8,15 @@ import styles from './Session.css';
 
 type Props = {
   session: object,
-  sessionCursorMeta: object
+  laps: object
 };
 
 export default class SessionHistoric extends Component<Props> {
   props: Props;
 
   render() {
-    const { session, sessionCursorMeta } = this.props;
+    const { session, laps } = this.props;
+    console.log(laps);
 
     return (
       <div className={styles.container}>
@@ -81,7 +82,7 @@ export default class SessionHistoric extends Component<Props> {
 
         <Segment inverted>
           <Header as="h3" inverted>
-            Number of records: {sessionCursorMeta.numberRecords}
+            Laps: {laps.map(lap => lap.lapTime/1000)}
           </Header>
         </Segment>
       </div>

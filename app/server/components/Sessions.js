@@ -34,10 +34,10 @@ export default class Sessions extends Component<Props> {
             {(() => {
               switch (session.sessionType) {
                 case 'live': {
-                  return <SessionLivePage session={session} />;
+                  return <SessionLivePage sessionId={sessionId} />;
                 }
                 case 'historic': {
-                  return <SessionHistoricPage session={session} />;
+                  return <SessionHistoricPage sessionId={sessionId} />;
                 }
                 default: {
                   return null;

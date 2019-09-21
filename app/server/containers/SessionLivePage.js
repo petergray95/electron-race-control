@@ -1,11 +1,10 @@
 import { connect } from 'react-redux';
 import SessionLive from '../components/SessionLive';
-import { getCursorMeta } from '../../../shared/reducers/cursor';
+import { makeGetLapsState } from '../../../shared/selectors/laps';
 
-function mapStateToProps(state, props) {
-  return {
-    sessionCursorMeta: getCursorMeta(state, props.session.sessionId)
-  };
+const makeMapStateToProps = () => {
+  const getLapsState = makeGetLapsState()
+  return (state, props) => getLapsState(state, props)
 }
 
-export default connect(mapStateToProps)(SessionLive);
+export default connect(makeMapStateToProps)(SessionLive)

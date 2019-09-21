@@ -1,8 +1,17 @@
 import { createSelector } from 'reselect'
 
-const getSession = (state, props) => state.sessions.byId[props.sessionId]
+const getSessionConfig = (state, props) => {
+  const session = state.sessions.byId[props.sessionId];
+  
+  return {
+    sessionId: session.sessionId,
+    name: session.name,
+    sessionType: session.sessionType,
+    color: session.color
+  }
+}
 
-export const makeGetSessionState = () => createSelector(
-  getSession,
-  (session) => ( session )
+export const makeGetSessionConfigState = () => createSelector(
+  getSessionConfig,
+  (sessionConfig) => ( sessionConfig )
 )

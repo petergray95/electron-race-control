@@ -1,11 +1,12 @@
-import { createSelector } from 'reselect'
+import { createSelector } from 'reselect';
+import { selectSession } from './sessions';
 
-const getLaps = (state, props) => {
-  const lapIds = state.sessions.byId[props.sessionId].laps
-  return lapIds.map(lapId => state.laps.byId[lapId])
-}
+const selectLapIds = (state, props) => selectSession(state, props).laps
+
+const selectLaps = state => state.laps.byId
 
 export const makeGetLapsState = () => createSelector(
-  getLaps,
-  (laps) => ( laps )
+  selectLapIds,
+  selectLaps,
+  ( lapIds) => ( lapIds.map(lapId => selectLaps[lapId]) )
 )

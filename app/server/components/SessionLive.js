@@ -15,6 +15,12 @@ type Props = {
 export default class SessionLive extends Component<Props> {
   props: Props;
 
+  componentWillReceiveProps(newProps) {
+    console.log(this.props);
+    console.log(newProps);
+    console.log(this.props === newProps);
+  }
+
   isSessionConfigValid() {
     const { session } = this.props;
 
@@ -37,6 +43,7 @@ export default class SessionLive extends Component<Props> {
 
   render() {
     const { session, laps } = this.props;
+    console.log('rendering', session, laps);
 
     return (
       <div className={styles.container}>
@@ -141,7 +148,7 @@ export default class SessionLive extends Component<Props> {
 
         <Segment inverted>
           <Header as="h3" inverted>
-            Laps: {laps}
+            Laps
           </Header>
         </Segment>
       </div>

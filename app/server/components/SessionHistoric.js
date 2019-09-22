@@ -82,7 +82,7 @@ export default class SessionHistoric extends Component<Props> {
 
         <Segment inverted>
           <Header as="h3" inverted>
-            Laps: {laps.map(lap => lap.lapTime/1000)}
+            Laps
           </Header>
         </Segment>
       </div>

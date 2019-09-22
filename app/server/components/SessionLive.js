@@ -43,7 +43,7 @@ export default class SessionLive extends Component<Props> {
 
   render() {
     const { session, laps } = this.props;
-    console.log('rendering', session, laps);
+    console.log('rendering Live', session, laps);
 
     return (
       <div className={styles.container}>

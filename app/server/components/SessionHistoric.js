@@ -16,7 +16,7 @@ export default class SessionHistoric extends Component<Props> {
 
   render() {
     const { session, laps } = this.props;
-    console.log(laps);
+    console.log('rendering Live', session, laps);
 
     return (
       <div className={styles.container}>

@@ -14,9 +14,17 @@ type Props = {
 export default class SessionHistoric extends Component<Props> {
   props: Props;
 
+  renderLaps(laps) {
+    return laps.map(lap =>
+      <tr>
+        <td>{lap.number}</td>
+        <td>{lap.lapTime}</td>
+      </tr>
+    )
+  }
+
   render() {
     const { session, laps } = this.props;
-    console.log('rendering Live', session, laps);
 
     return (
       <div className={styles.container}>
@@ -84,6 +92,17 @@ export default class SessionHistoric extends Component<Props> {
           <Header as="h3" inverted>
             Laps
           </Header>
+          <table>
+            <thead>
+              <tr>
+                <th>Lap Number</th>
+                <th>Lap Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              {this.renderLaps(laps)}
+            </tbody>
+          </table>
         </Segment>
       </div>
     );

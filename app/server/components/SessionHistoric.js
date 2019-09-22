@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { Button, Header, Form, Segment } from 'semantic-ui-react';
+import { Button, Header, Form, Segment, Table } from 'semantic-ui-react';
 import { ipcRenderer } from 'electron-better-ipc';
 import ipcConstants from '../../../shared/constants/ipc-channels';
 
@@ -16,10 +16,10 @@ export default class SessionHistoric extends Component<Props> {
 
   renderLaps(laps) {
     return laps.map(lap =>
-      <tr>
-        <td>{lap.number}</td>
-        <td>{lap.lapTime}</td>
-      </tr>
+      <Table.Row key={lap.id}>
+        <Table.Cell>{lap.number}</Table.Cell>
+        <Table.Cell>{lap.lapTime}</Table.Cell>
+      </Table.Row>
     )
   }
 
@@ -92,17 +92,17 @@ export default class SessionHistoric extends Component<Props> {
           <Header as="h3" inverted>
             Laps
           </Header>
-          <table>
-            <thead>
-              <tr>
-                <th>Lap Number</th>
-                <th>Lap Time</th>
-              </tr>
-            </thead>
-            <tbody>
+          <Table inverted>
+            <Table.Header>
+              <Table.Row>
+                <Table.HeaderCell>Lap Number</Table.HeaderCell>
+                <Table.HeaderCell>Lap Time</Table.HeaderCell>
+              </Table.Row>
+            </Table.Header>
+            <Table.Body>
               {this.renderLaps(laps)}
-            </tbody>
-          </table>
+            </Table.Body>
+          </Table>
         </Segment>
       </div>
     );

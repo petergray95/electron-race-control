@@ -54,6 +54,7 @@ class BaseDataSession {
     const laps = [];
 
     const lapData = _.get(this.data, ['data', 'lapData'], {});
+    console.log(lapData);
 
     let currentLapNum = null;
     let currentLapStart = null;
@@ -81,7 +82,13 @@ class BaseDataSession {
             startTime: currentLapStart,
             number: currentLapNum,
             endTime: timestamps[timestampIndex - 1],
-            lapTime: timestamps[timestampIndex - 1] - currentLapStart,
+            lapTime:
+              lapData[timestampGroup]['m_lapData.0.m_lastLapTime'][
+                timestampIndex
+              ],
+            isValid: !lapData[timestampGroup][
+              'm_lapData.0.m_currentLapInvalid'
+            ][timestampIndex - 1],
             isFullLap: true
           };
 
@@ -102,6 +109,9 @@ class BaseDataSession {
             number: currentLapNum,
             endTime: timestamps[timestampIndex - 1],
             lapTime: timestamps[timestampIndex - 1] - currentLapStart,
+            isValid: !lapData[timestampGroup][
+              'm_lapData.0.m_currentLapInvalid'
+            ][timestampIndex - 1],
             isFullLap: false
           };
 

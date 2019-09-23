@@ -32,6 +32,7 @@ export default class SessionHistoric extends Component<Props> {
                   icon="trash"
                   inverted
                   color="orange"
+                  content="Remove"
                   onClick={() => {
                     ipcRenderer.send(ipcConstants.COMMAND, {
                       command: 'server:remove',

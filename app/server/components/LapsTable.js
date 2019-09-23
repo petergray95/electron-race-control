@@ -58,7 +58,6 @@ export default class LapsTable extends Component<Props> {
         </Table.Cell>
         <Table.Cell>
           <Checkbox
-            slider
             checked={this.isLapSelected(lap.id)}
             onChange={() => this.handleSelect(lap.id)}
           />
@@ -81,7 +80,7 @@ export default class LapsTable extends Component<Props> {
     const { laps } = this.props;
     const { selections } = this.state;
     return (
-      <Table inverted selectable>
+      <Table inverted selectable textAlign="center">
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell>Number</Table.HeaderCell>

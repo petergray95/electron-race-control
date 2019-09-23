@@ -16,6 +16,27 @@ import store from './store';
 
 const { PACKETS } = constants;
 
+const getTimestampGroup = timestamp => Math.round(timestamp / 10000) * 10000;
+
+const getTimestampGroupRange = (start, end) => {
+  const startGroup = getTimestampGroup(start);
+  const endGroup = getTimestampGroup(end);
+
+  const timestampGroups = Array((endGroup - startGroup) / 10000 + 1).fill(null);
+
+  return timestampGroups.map(
+    (timestampGroup, index) => startGroup + index * 10000
+  );
+};
+
+const createDataPoint = (data, channels, index) => {
+  const dataPoint = {};
+  channels.forEach(channel => {
+    dataPoint[channel] = data[channel][index];
+  });
+  return dataPoint;
+};
+
 class BaseDataSession {
   constructor() {
     this.data = {};
@@ -219,7 +240,7 @@ class BaseDataSessionLive extends BaseDataSession {
     const start = performance.now();
 
     const timestamp = new Date().getTime();
-    const timestampRound = Math.floor(timestamp / 10000) * 10000;
+    const timestampRound = getTimestampGroup(timestamp);
 
     const messageFlat = flatten(message);
 
@@ -365,6 +386,82 @@ class DataModel {
     session.setColor(color);
     const sessionConfig = session.getStoreConfig();
     store.dispatch(updateSession(sessionConfig));
+  }
+
+  exportLaps(laps: array) {
+    const channels = ['times', 'm_carTelemetryData.0.m_speed'];
+
+    laps.forEach(lap => {
+      const session = this.getSession(lap.sessionId);
+
+      const timestampGroups = getTimestampGroupRange(
+        lap.startTime,
+        lap.endTime
+      );
+
+      const output = [];
+
+      timestampGroups.forEach((timestampGroup, groupIndex) => {
+        const timestampGroupData = _.get(
+          session.data,
+          ['data', 'carTelemetry', `_${timestampGroup}`],
+          {}
+        );
+
+        switch (groupIndex) {
+          case 0: {
+            const firstIndex = timestampGroupData.times.findIndex(
+              time => time >= lap.startTime
+            );
+            const subTimes = timestampGroupData.times.slice(firstIndex);
+
+            subTimes.forEach((time, index) => {
+              const offsetIndex = firstIndex + index;
+              output.push(
+                createDataPoint(timestampGroupData, channels, offsetIndex)
+              );
+              // const dataPoint = {};
+              // channels.forEach(channel => {
+              //   dataPoint[channel] = timestampGroupData[channel][offsetIndex]
+              // });
+              // output.push(dataPoint);
+            });
+
+            break;
+          }
+          case timestampGroups.length - 1: {
+            const lastIndex = timestampGroupData.times.findIndex(
+              time => time >= lap.endTime
+            );
+            const subTimes = timestampGroupData.times.slice(0, lastIndex);
+
+            subTimes.forEach((time, index) => {
+              output.push(createDataPoint(timestampGroupData, channels, index));
+              // const dataPoint = {};
+              // channels.forEach(channel => dataPoint[channel] = timestampGroupData[channel][index]);
+              // output.push(dataPoint);
+            });
+            break;
+          }
+          default: {
+            timestampGroupData.times.forEach((time, index) => {
+              output.push(createDataPoint(timestampGroupData, channels, index));
+              // const dataPoint = {};
+              // channels.forEach(channel => dataPoint[channel] = timestampGroupData[channel][index]);
+              // output.push(dataPoint);
+            });
+            break;
+          }
+        }
+      });
+
+      fs.writeFile(
+        `./DATA/${session.name}_${lap.number}.json`,
+        JSON.stringify(output),
+        'utf8',
+        () => {}
+      );
+    });
   }
 }
 

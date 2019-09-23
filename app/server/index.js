@@ -53,6 +53,11 @@ ipcRenderer.on(ipcConstants.COMMAND, (event, message) => {
       dataModel.setSessionColor(sessionId, color);
       break;
     }
+    case 'server:export_laps': {
+      const { laps } = message;
+      dataModel.exportLaps(laps);
+      break;
+    }
     default: {
       break;
     }

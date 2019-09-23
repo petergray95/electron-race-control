@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { Button, Header, Form, Segment } from 'semantic-ui-react';
+import { Button, Grid, Header, Form, Segment } from 'semantic-ui-react';
 import { ipcRenderer } from 'electron-better-ipc';
 import ipcConstants from '../../../shared/constants/ipc-channels';
 import LapsTablePage from '../containers/LapsTablePage';
@@ -19,10 +19,31 @@ export default class SessionHistoric extends Component<Props> {
 
     return (
       <div className={styles.container}>
+        <Grid columns={2}>
+          <Grid.Row>
+            <Grid.Column width={8}>
+              <Header as="h1" inverted>
+                Data Server [{session.sessionType.toUpperCase()}]
+              </Header>
+            </Grid.Column>
+            <Grid.Column width={8} textAlign="right">
+              <Button.Group>
+                <Button
+                  icon="trash"
+                  inverted
+                  color="orange"
+                  onClick={() => {
+                    ipcRenderer.send(ipcConstants.COMMAND, {
+                      command: 'server:remove',
+                      sessionId: session.sessionId
+                    });
+                  }}
+                />
+              </Button.Group>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
         <Form inverted onSubmit={this.handleSubmit}>
-          <Header as="h1" inverted>
-            Data Server [{session.sessionType.toUpperCase()}]
-          </Header>
           <Header as="h3" inverted>
             Configuration
           </Header>
@@ -55,22 +76,6 @@ export default class SessionHistoric extends Component<Props> {
             Laps
           </Header>
           <LapsTablePage sessionId={session.sessionId} />
-        </Segment>
-
-        <Segment inverted>
-          <Button
-            inverted
-            labelPosition="left"
-            color="orange"
-            content="Remove Session"
-            icon="trash"
-            onClick={() => {
-              ipcRenderer.send(ipcConstants.COMMAND, {
-                command: 'server:remove',
-                sessionId: session.sessionId
-              });
-            }}
-          />
         </Segment>
       </div>
     );

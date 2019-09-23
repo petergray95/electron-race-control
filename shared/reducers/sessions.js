@@ -1,6 +1,6 @@
 // @flow
 import { combineReducers } from 'redux';
-import { ADD_SESSION } from '../actions/sessions';
+import { ADD_SESSION, REMOVE_SESSION } from '../actions/sessions';
 import { ADD_LAP } from '../actions/laps';
 
 import type { Action } from './types';
@@ -28,6 +28,11 @@ function sessionsById(state = {}, action: Action) {
       const { sessionId, sessionConfig } = action.payload;
       return { ...state, [sessionId]: { ...sessionConfig, laps: [] } };
     }
+    case REMOVE_SESSION: {
+      const { sessionId } = action.payload;
+      const { [sessionId]: session, ...rest } = state;
+      return rest;
+    }
     default:
       return state;
   }
@@ -40,10 +45,19 @@ function addSessionId(state, action: Action) {
   return state.concat(sessionId);
 }
 
+function removeSessionId(state, action: Action) {
+  const { payload } = action;
+  const { sessionId } = payload;
+
+  return state.filter(id => id !== sessionId);
+}
+
 function allSessions(state = [], action: Action) {
   switch (action.type) {
     case ADD_SESSION:
       return addSessionId(state, action);
+    case REMOVE_SESSION:
+      return removeSessionId(state, action);
     default:
       return state;
   }

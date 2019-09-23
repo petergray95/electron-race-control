@@ -420,11 +420,6 @@ class DataModel {
               output.push(
                 createDataPoint(timestampGroupData, channels, offsetIndex)
               );
-              // const dataPoint = {};
-              // channels.forEach(channel => {
-              //   dataPoint[channel] = timestampGroupData[channel][offsetIndex]
-              // });
-              // output.push(dataPoint);
             });
 
             break;
@@ -437,18 +432,12 @@ class DataModel {
 
             subTimes.forEach((time, index) => {
               output.push(createDataPoint(timestampGroupData, channels, index));
-              // const dataPoint = {};
-              // channels.forEach(channel => dataPoint[channel] = timestampGroupData[channel][index]);
-              // output.push(dataPoint);
             });
             break;
           }
           default: {
             timestampGroupData.times.forEach((time, index) => {
               output.push(createDataPoint(timestampGroupData, channels, index));
-              // const dataPoint = {};
-              // channels.forEach(channel => dataPoint[channel] = timestampGroupData[channel][index]);
-              // output.push(dataPoint);
             });
             break;
           }

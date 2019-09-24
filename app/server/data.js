@@ -15,7 +15,7 @@ import { addLap } from '../../shared/actions/laps';
 import { updateCursor } from '../../shared/actions/cursor';
 import store from './store';
 
-const { PACKETS } = constants;
+const { DRIVERS, PACKETS, TEAMS, TRACKS, WEATHER } = constants;
 
 const getTimestampGroup = timestamp => Math.round(timestamp / 10000) * 10000;
 
@@ -28,6 +28,20 @@ const getTimestampGroupRange = (start, end) => {
   return timestampGroups.map(
     (timestampGroup, index) => startGroup + index * 10000
   );
+};
+
+const getClosestTimestamp = (timestamps, timestamp) =>
+  timestamps.reduce((prev, curr) =>
+    Math.abs(curr - timestamp) < Math.abs(prev - timestamp) ? curr : prev
+  );
+
+const getClosestValue = (data, timestamp, group, channel) => {
+  const timestampGroup = getTimestampGroup(timestamp);
+  const timestamps = data[group][`_${timestampGroup}`].times;
+  const closestTimestamp = getClosestTimestamp(timestamps, timestamp);
+  const index = timestamps.findIndex(ts => ts === closestTimestamp);
+
+  return data[group][`_${timestampGroup}`][channel][index];
 };
 
 class BaseDataSession {
@@ -99,10 +113,60 @@ class BaseDataSession {
               lapData[timestampGroup]['m_lapData.0.m_lastLapTime'][
                 timestampIndex
               ],
+            sector1Time:
+              lapData[timestampGroup]['m_lapData.0.m_sector1Time'][
+                timestampIndex - 1
+              ],
+            sector2Time:
+              lapData[timestampGroup]['m_lapData.0.m_sector2Time'][
+                timestampIndex - 1
+              ],
             isValid: !lapData[timestampGroup][
               'm_lapData.0.m_currentLapInvalid'
             ][timestampIndex - 1],
-            isFullLap: true
+            isFullLap: true,
+            circuit:
+              TRACKS[
+                getClosestValue(
+                  this.data.data,
+                  timestamps[timestampIndex - 1],
+                  'session',
+                  'm_trackId'
+                )
+              ].name,
+            name: getClosestValue(
+              this.data.data,
+              timestamps[timestampIndex - 1],
+              'participants',
+              'm_participants.0.m_name'
+            ),
+            team:
+              TEAMS[
+                getClosestValue(
+                  this.data.data,
+                  timestamps[timestampIndex - 1],
+                  'participants',
+                  'm_participants.0.m_teamId'
+                )
+              ].name,
+            driver:
+              DRIVERS[
+                getClosestValue(
+                  this.data.data,
+                  timestamps[timestampIndex - 1],
+                  'participants',
+                  'm_participants.0.m_driverId'
+                )
+              ],
+            weather:
+              WEATHER[
+                getClosestValue(
+                  this.data.data,
+                  timestamps[timestampIndex - 1],
+                  'session',
+                  'm_weather'
+                )
+              ]
           };
 
           laps.push(lap);
@@ -120,12 +184,62 @@ class BaseDataSession {
             sessionId: this.id,
             startTime: currentLapStart,
             number: currentLapNum,
-            endTime: timestamps[timestampIndex - 1],
-            lapTime: timestamps[timestampIndex - 1] - currentLapStart,
+            endTime: timestamps[timestampIndex],
+            lapTime: timestamps[timestampIndex] - currentLapStart,
+            sector1Time:
+              lapData[timestampGroup]['m_lapData.0.m_sector1Time'][
+                timestampIndex
+              ],
+            sector2Time:
+              lapData[timestampGroup]['m_lapData.0.m_sector2Time'][
+                timestampIndex
+              ],
             isValid: !lapData[timestampGroup][
               'm_lapData.0.m_currentLapInvalid'
-            ][timestampIndex - 1],
-            isFullLap: false
+            ][timestampIndex],
+            isFullLap: false,
+            circuit:
+              TRACKS[
+                getClosestValue(
+                  this.data.data,
+                  timestamps[timestampIndex],
+                  'session',
+                  'm_trackId'
+                )
+              ].name,
+            name: getClosestValue(
+              this.data.data,
+              timestamps[timestampIndex],
+              'participants',
+              'm_participants.0.m_name'
+            ),
+            team:
+              TEAMS[
+                getClosestValue(
+                  this.data.data,
+                  timestamps[timestampIndex],
+                  'participants',
+                  'm_participants.0.m_teamId'
+                )
+              ].name,
+            driver:
+              DRIVERS[
+                getClosestValue(
+                  this.data.data,
+                  timestamps[timestampIndex],
+                  'participants',
+                  'm_participants.0.m_driverId'
+                )
+              ],
+            weather:
+              WEATHER[
+                getClosestValue(
+                  this.data.data,
+                  timestamps[timestampIndex],
+                  'session',
+                  'm_weather'
+                )
+              ]
           };
 
           laps.push(lap);
@@ -134,14 +248,24 @@ class BaseDataSession {
     });
 
     laps.forEach(lap => {
-      store.dispatch(addLap(this.id, lap.id, lap));
+      const lapConfig = {
+        ...lap,
+        sector1Time: lap.sector1Time !== 0 ? lap.sector1Time : null,
+        sector2Time: lap.sector2Time !== 0 ? lap.sector2Time : null
+      };
+
+      console.log(lapConfig);
+
+      store.dispatch(addLap(this.id, lap.id, lapConfig));
     });
+    console.log(laps);
   }
 
   loadData(filepath) {
     fs.readFile(filepath, (fsErr, data) => {
       zlib.inflate(data, (zlibErr, result) => {
         const parsedData = JSON.parse(result);
+        console.log(parsedData);
         this.setData(parsedData);
       });
     });
@@ -395,7 +519,11 @@ class DataModel {
 
       const timeGroups = getTimestampGroupRange(lap.startTime, lap.endTime);
 
-      const output = { session: session.getStoreConfig(), lap, data: {} };
+      const output = {
+        session: session.getStoreConfig(),
+        lap,
+        data: {}
+      };
 
       channels.forEach(([group, channel]) => {
         const key = `${group}.${channel}`;

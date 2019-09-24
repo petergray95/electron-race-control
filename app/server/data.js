@@ -4,6 +4,7 @@ import fs from 'fs';
 import zlib from 'zlib';
 import { flatten } from 'flat';
 import { F1TelemetryClient, constants } from 'f1-telemetry-client';
+import simplifyPoints from './simplify';
 import { updateData } from '../../shared/actions/data';
 import {
   addSession,
@@ -29,14 +30,6 @@ const getTimestampGroupRange = (start, end) => {
   );
 };
 
-const createDataPoint = (data, channels, index) => {
-  const dataPoint = {};
-  channels.forEach(channel => {
-    dataPoint[channel] = data[channel][index];
-  });
-  return dataPoint;
-};
-
 class BaseDataSession {
   constructor() {
     this.data = {};
@@ -45,6 +38,7 @@ class BaseDataSession {
     this.id = uuid();
     this.color = '#f44336';
     this.sessionType = 'base';
+    this.isRunning = false;
   }
 
   getStoreConfig() {
@@ -52,7 +46,8 @@ class BaseDataSession {
       sessionId: this.id,
       name: this.name,
       sessionType: this.sessionType,
-      color: this.color
+      color: this.color,
+      isRunning: this.isRunning
     };
   }
 
@@ -70,12 +65,9 @@ class BaseDataSession {
   }
 
   getLaps() {
-    const start = performance.now();
-
     const laps = [];
 
     const lapData = _.get(this.data, ['data', 'lapData'], {});
-    console.log(lapData);
 
     let currentLapNum = null;
     let currentLapStart = null;
@@ -140,8 +132,6 @@ class BaseDataSession {
         }
       });
     });
-    const duration = performance.now() - start;
-    console.log('retrieving lap information: ', duration, laps);
 
     laps.forEach(lap => {
       store.dispatch(addLap(this.id, lap.id, lap));
@@ -191,7 +181,6 @@ class BaseDataSessionLive extends BaseDataSession {
     super();
     this.sessionType = 'live';
     this.client = null;
-    this.isRunning = false;
     this.throttledUpdateStoreData = _.throttle(this.updateStoreData, 200);
     this.throttledUpdateStoreCursor = _.throttle(this.updateStoreCursor, 50);
   }
@@ -362,11 +351,15 @@ class DataModel {
   startRecordingSession(sessionId) {
     const session = this.getSession(sessionId);
     session.start();
+    const sessionConfig = session.getStoreConfig();
+    store.dispatch(updateSession(sessionConfig));
   }
 
   stopRecordingSession(sessionId) {
     const session = this.getSession(sessionId);
     session.stop();
+    const sessionConfig = session.getStoreConfig();
+    store.dispatch(updateSession(sessionConfig));
   }
 
   async downloadSession(sessionId) {
@@ -389,59 +382,64 @@ class DataModel {
   }
 
   exportLaps(laps: array) {
-    const channels = ['times', 'm_carTelemetryData.0.m_speed'];
+    const start = performance.now();
+
+    const channels = [
+      ['carTelemetry', 'm_carTelemetryData.0.m_speed'],
+      ['carTelemetry', 'm_carTelemetryData.0.m_throttle'],
+      ['carTelemetry', 'm_carTelemetryData.0.m_brake']
+    ];
 
     laps.forEach(lap => {
       const session = this.getSession(lap.sessionId);
 
-      const timestampGroups = getTimestampGroupRange(
-        lap.startTime,
-        lap.endTime
-      );
+      const timeGroups = getTimestampGroupRange(lap.startTime, lap.endTime);
 
-      const output = [];
+      const output = { session: session.getStoreConfig(), lap, data: {} };
 
-      timestampGroups.forEach((timestampGroup, groupIndex) => {
-        const timestampGroupData = _.get(
-          session.data,
-          ['data', 'carTelemetry', `_${timestampGroup}`],
-          {}
-        );
+      channels.forEach(([group, channel]) => {
+        const key = `${group}.${channel}`;
+        output.data[key] = [];
 
-        switch (groupIndex) {
-          case 0: {
-            const firstIndex = timestampGroupData.times.findIndex(
-              time => time >= lap.startTime
-            );
-            const subTimes = timestampGroupData.times.slice(firstIndex);
+        timeGroups.forEach((timeGroup, groupIndex) => {
+          const groupData = _.get(
+            session.data,
+            ['data', group, `_${timeGroup}`],
+            {}
+          );
 
-            subTimes.forEach((time, index) => {
-              const offsetIndex = firstIndex + index;
-              output.push(
-                createDataPoint(timestampGroupData, channels, offsetIndex)
+          let subTimes = [];
+          let subValues = [];
+
+          switch (groupIndex) {
+            case 0: {
+              const firstIndex = groupData.times.findIndex(
+                time => time >= lap.startTime
               );
-            });
+              subTimes = groupData.times.slice(firstIndex);
+              subValues = groupData[channel].slice(firstIndex);
+              break;
+            }
+            case groupData.length - 1: {
+              const lastIndex = groupData.times.findIndex(
+                time => time >= lap.endTime
+              );
+              subTimes = groupData.times.slice(0, lastIndex);
+              subValues = groupData[channel].slice(0, lastIndex);
+              break;
+            }
+            default: {
+              subTimes = groupData.times;
+              subValues = groupData[channel];
+              break;
+            }
+          }
+          subTimes.forEach((time, index) => {
+            output.data[key].push({ time, value: subValues[index] });
+          });
+        });
 
-            break;
-          }
-          case timestampGroups.length - 1: {
-            const lastIndex = timestampGroupData.times.findIndex(
-              time => time >= lap.endTime
-            );
-            const subTimes = timestampGroupData.times.slice(0, lastIndex);
-
-            subTimes.forEach((time, index) => {
-              output.push(createDataPoint(timestampGroupData, channels, index));
-            });
-            break;
-          }
-          default: {
-            timestampGroupData.times.forEach((time, index) => {
-              output.push(createDataPoint(timestampGroupData, channels, index));
-            });
-            break;
-          }
-        }
+        output.data[key] = simplifyPoints(output.data[key], 0.1, true);
       });
 
       fs.writeFile(
@@ -451,6 +449,9 @@ class DataModel {
         () => {}
       );
     });
+
+    const duration = performance.now() - start;
+    console.log('exporting laps: ', duration);
   }
 }
 

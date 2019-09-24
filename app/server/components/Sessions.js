@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { Header, Tab } from 'semantic-ui-react';
+import { Header, Icon, Tab } from 'semantic-ui-react';
 import SessionLivePage from '../containers/SessionLivePage';
 import SessionHistoricPage from '../containers/SessionHistoricPage';
 
@@ -28,7 +28,16 @@ export default class Sessions extends Component<Props> {
     Object.keys(sessions).forEach((sessionId, index) => {
       const session = sessions[sessionId];
       const tab = {
-        menuItem: `${index + 1}: ${session.name}`,
+        menuItem: {
+          key: sessionId,
+          content: `${index + 1}: ${session.name}`,
+          icon: (
+            <Icon
+              name="play circle outline"
+              color={session.isRunning ? 'green' : 'grey'}
+            />
+          )
+        },
         render: () => (
           <Tab.Pane inverted attached={false}>
             {(() => {

@@ -236,20 +236,20 @@ class BaseDataSessionLive extends BaseDataSession {
     Object.entries(messageFlat).forEach(([key, value]) => {
       const data = _.get(
         this.data,
-        [messageType, `_${timestampRound}`, key],
+        [messageType, key, `_${timestampRound}`],
         []
       );
       data.push(value);
-      _.set(this.data, [messageType, `_${timestampRound}`, key], data);
+      _.set(this.data, [messageType, key, `_${timestampRound}`], data);
     });
 
     const times = _.get(
       this.data,
-      [messageType, `_${timestampRound}`, 'times'],
+      [messageType, 'times', `_${timestampRound}`],
       []
     );
     times.push(timestamp);
-    _.set(this.data, [messageType, `_${timestampRound}`, 'times'], times);
+    _.set(this.data, [messageType, 'times', `_${timestampRound}`], times);
 
     const duration = performance.now() - start;
 

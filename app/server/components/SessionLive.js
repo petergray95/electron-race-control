@@ -10,22 +10,16 @@ import {
 } from 'semantic-ui-react';
 import { ipcRenderer } from 'electron-better-ipc';
 import ipcConstants from '../../../shared/constants/ipc-channels';
+import LapsTablePage from '../containers/LapsTablePage';
 
 import styles from './Session.css';
 
 type Props = {
-  session: object,
-  laps: object
+  session: object
 };
 
 export default class SessionLive extends Component<Props> {
   props: Props;
-
-  componentWillReceiveProps(newProps) {
-    console.log(this.props);
-    console.log(newProps);
-    console.log(this.props === newProps);
-  }
 
   isSessionConfigValid() {
     const { session } = this.props;
@@ -48,8 +42,7 @@ export default class SessionLive extends Component<Props> {
   }
 
   render() {
-    const { session, laps } = this.props;
-    console.log('rendering Live', session, laps);
+    const { session } = this.props;
 
     return (
       <div className={styles.container}>
@@ -66,6 +59,7 @@ export default class SessionLive extends Component<Props> {
                 inverted
                 color="green"
                 content="Start"
+                disabled={session.isRunning}
                 onClick={() => {
                   ipcRenderer.send(ipcConstants.COMMAND, {
                     command: 'server:start',
@@ -78,6 +72,7 @@ export default class SessionLive extends Component<Props> {
                 inverted
                 color="red"
                 content="Stop"
+                disabled={!session.isRunning}
                 onClick={() => {
                   ipcRenderer.send(ipcConstants.COMMAND, {
                     command: 'server:stop',
@@ -153,6 +148,7 @@ export default class SessionLive extends Component<Props> {
           <Header as="h3" inverted>
             Laps
           </Header>
+          <LapsTablePage sessionId={session.sessionId} />
         </Segment>
       </div>
     );

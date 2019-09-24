@@ -352,14 +352,14 @@ class DataModel {
     const session = this.getSession(sessionId);
     session.start();
     const sessionConfig = session.getStoreConfig();
-    store.dispatch(updateSession(sessionConfig));
+    store.dispatch(updateSession(sessionId, sessionConfig));
   }
 
   stopRecordingSession(sessionId) {
     const session = this.getSession(sessionId);
     session.stop();
     const sessionConfig = session.getStoreConfig();
-    store.dispatch(updateSession(sessionConfig));
+    store.dispatch(updateSession(sessionId, sessionConfig));
   }
 
   async downloadSession(sessionId) {
@@ -371,17 +371,17 @@ class DataModel {
     const session = this.getSession(sessionId);
     session.setName(name);
     const sessionConfig = session.getStoreConfig();
-    store.dispatch(updateSession(sessionConfig));
+    store.dispatch(updateSession(sessionId, sessionConfig));
   }
 
   setSessionColor(sessionId, color) {
     const session = this.getSession(sessionId);
     session.setColor(color);
     const sessionConfig = session.getStoreConfig();
-    store.dispatch(updateSession(sessionConfig));
+    store.dispatch(updateSession(sessionId, sessionConfig));
   }
 
-  exportLaps(laps: array) {
+  exportLaps(laps: array, simplify: boolean = true) {
     const start = performance.now();
 
     const channels = [
@@ -399,7 +399,7 @@ class DataModel {
 
       channels.forEach(([group, channel]) => {
         const key = `${group}.${channel}`;
-        output.data[key] = [];
+        const dataArray = [];
 
         timeGroups.forEach((timeGroup, groupIndex) => {
           const groupData = _.get(
@@ -435,11 +435,13 @@ class DataModel {
             }
           }
           subTimes.forEach((time, index) => {
-            output.data[key].push({ time, value: subValues[index] });
+            dataArray.push({ time, value: subValues[index] });
           });
         });
 
-        output.data[key] = getSimplifiedPoints(output.data[key]);
+        output.data[key] = simplify
+          ? getSimplifiedPoints(dataArray)
+          : dataArray;
       });
 
       fs.writeFile(

@@ -33,7 +33,7 @@ export default class Sessions extends Component<Props> {
           content: `${index + 1}: ${session.name}`,
           icon: (
             <Icon
-              name="play circle outline"
+              name="circle outline"
               color={session.isRunning ? 'green' : 'grey'}
             />
           )

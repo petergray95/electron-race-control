@@ -1,8 +1,8 @@
 {
   "name": "electron-race-control",
-  "productName": "ElectronRaceControl",
+  "productName": "SimRaceHub",
   "version": "0.0.1",
-  "description": "Electron race control. Car racing game telemetry acquirer and visualiser.",
+  "description": "Sim Race Hub. Racing game telemetry acquirer and visualiser.",
   "scripts": {
     "build": "concurrently \"yarn build-main\" \"yarn build-renderer\"",
     "build-dll": "cross-env NODE_ENV=development webpack --config ./configs/webpack.config.renderer.dev.dll.babel.js --colors",

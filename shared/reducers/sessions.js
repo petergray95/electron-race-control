@@ -1,6 +1,11 @@
 // @flow
 import { combineReducers } from 'redux';
-import { ADD_SESSION, REMOVE_SESSION } from '../actions/sessions';
+import update from 'immutability-helper';
+import {
+  ADD_SESSION,
+  UPDATE_SESSION,
+  REMOVE_SESSION
+} from '../actions/sessions';
 import { ADD_LAP } from '../actions/laps';
 
 import type { Action } from './types';
@@ -27,6 +32,10 @@ function sessionsById(state = {}, action: Action) {
     case ADD_SESSION: {
       const { sessionId, sessionConfig } = action.payload;
       return { ...state, [sessionId]: { ...sessionConfig, laps: [] } };
+    }
+    case UPDATE_SESSION: {
+      const { sessionId, sessionConfig } = action.payload;
+      return update(state, { [sessionId]: { $merge: sessionConfig } });
     }
     case REMOVE_SESSION: {
       const { sessionId } = action.payload;

@@ -439,7 +439,7 @@ class DataModel {
           });
         });
 
-        output.data[key] = simplifyPoints(output.data[key], 0.1, true);
+        output.data[key] = getSimplifiedPoints(output.data[key]);
       });
 
       fs.writeFile(
@@ -454,6 +454,32 @@ class DataModel {
     console.log('exporting laps: ', duration);
   }
 }
+
+const getSimplifiedPoints = points => {
+  let simplifiedPoints = points;
+  const thresholds = [
+    0.1,
+    0.2,
+    0.3,
+    0.5,
+    0.75,
+    1.0,
+    1.25,
+    1.5,
+    2,
+    2.5,
+    3,
+    4,
+    5
+  ];
+
+  while (simplifiedPoints.length > 500 || thresholds.length === 0) {
+    const threshold = thresholds.shift();
+    simplifiedPoints = simplifyPoints(points, threshold, true);
+  }
+
+  return simplifiedPoints;
+};
 
 const dataModel = new DataModel();
 

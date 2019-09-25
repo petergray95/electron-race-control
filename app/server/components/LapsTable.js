@@ -36,7 +36,8 @@ export default class LapsTable extends Component<Props> {
 
   isLapSelected = id => _.get(this.state, ['selections', id], false);
 
-  renderLaps(laps) {
+  renderLaps(allLaps) {
+    const laps = allLaps.filter(lap => Number(lap.carId) === 0);
     console.log(laps);
     const validLaps = laps.filter(lap => lap.isValid && lap.isFullLap);
     const purpleSectors = {

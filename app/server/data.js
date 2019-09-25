@@ -64,6 +64,13 @@ class BaseDataSession {
       carId: carIndex,
       startTime,
       endTime,
+      number: getClosestValue(
+        data,
+        indexes.lapData.timestampGroup,
+        indexes.lapData.index,
+        'lapData',
+        `m_lapData.${carIndex}.m_currentLapNum`
+      ),
       calculatedLapTime: null,
       lapTime: null,
       isFullLap: null,
@@ -81,7 +88,7 @@ class BaseDataSession {
         'lapData',
         `m_lapData.${carIndex}.m_sector2Time`
       ),
-      isValid: getClosestValue(
+      isValid: !getClosestValue(
         data,
         indexes.lapData.timestampGroup,
         indexes.lapData.index,
@@ -213,7 +220,8 @@ class BaseDataSession {
 
           if (
             timestampGroupIndex + 1 === Object.keys(lapData).length &&
-            timestampIndex + 1 === timestamps.length
+            timestampIndex + 1 === timestamps.length &&
+            lapNumber !== 0
           ) {
             let lap = this.getLapInfo(
               data,
@@ -228,7 +236,8 @@ class BaseDataSession {
               isFullLap: false,
               calculatedLapTime: timestamp - car.cursor.startTime,
               sector1Time: lap.sector1Time !== 0 ? lap.sector1Time : null,
-              sector2Time: lap.sector2Time !== 0 ? lap.sector2Time : null
+              sector2Time: lap.sector2Time !== 0 ? lap.sector2Time : null,
+              sector3Time: lap.sector3Time !== 0 ? lap.sector3Time : null
             };
 
             car.laps.push(lap);

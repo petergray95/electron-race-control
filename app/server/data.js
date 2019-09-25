@@ -4,7 +4,13 @@ import fs from 'fs';
 import zlib from 'zlib';
 import { flatten } from 'flat';
 import { F1TelemetryClient, constants } from 'f1-telemetry-client';
-import simplifyPoints from './simplify';
+import {
+  getTimestampGroup,
+  getTimestampGroupRange,
+  getClosestIndexes,
+  getClosestValue,
+  getSimplifiedPoints
+} from './data/helpers';
 import { updateData } from '../../shared/actions/data';
 import {
   addSession,
@@ -16,33 +22,6 @@ import { updateCursor } from '../../shared/actions/cursor';
 import store from './store';
 
 const { DRIVERS, PACKETS, TEAMS, TRACKS, WEATHER } = constants;
-
-const getTimestampGroup = timestamp => Math.round(timestamp / 10000) * 10000;
-
-const getTimestampGroupRange = (start, end) => {
-  const startGroup = getTimestampGroup(start);
-  const endGroup = getTimestampGroup(end);
-
-  const timestampGroups = Array((endGroup - startGroup) / 10000 + 1).fill(null);
-
-  return timestampGroups.map(
-    (timestampGroup, index) => startGroup + index * 10000
-  );
-};
-
-const getClosestTimestamp = (timestamps, timestamp) =>
-  timestamps.reduce((prev, curr) =>
-    Math.abs(curr - timestamp) < Math.abs(prev - timestamp) ? curr : prev
-  );
-
-const getClosestValue = (data, timestamp, group, channel) => {
-  const timestampGroup = getTimestampGroup(timestamp);
-  const timestamps = data[group][`_${timestampGroup}`].times;
-  const closestTimestamp = getClosestTimestamp(timestamps, timestamp);
-  const index = timestamps.findIndex(ts => ts === closestTimestamp);
-
-  return data[group][`_${timestampGroup}`][channel][index];
-};
 
 class BaseDataSession {
   constructor() {
@@ -78,185 +57,185 @@ class BaseDataSession {
     this.getLaps();
   }
 
+  getLapInfo(data, carIndex, indexes, startTime, endTime) {
+    return {
+      id: uuid(),
+      sessionId: this.id,
+      carId: carIndex,
+      startTime,
+      endTime,
+      calculatedLapTime: null,
+      lapTime: null,
+      isFullLap: null,
+      sector1Time: getClosestValue(
+        data,
+        indexes.lapData.timestampGroup,
+        indexes.lapData.index,
+        'lapData',
+        `m_lapData.${carIndex}.m_sector1Time`
+      ),
+      sector2Time: getClosestValue(
+        data,
+        indexes.lapData.timestampGroup,
+        indexes.lapData.index,
+        'lapData',
+        `m_lapData.${carIndex}.m_sector2Time`
+      ),
+      isValid: getClosestValue(
+        data,
+        indexes.lapData.timestampGroup,
+        indexes.lapData.index,
+        'lapData',
+        `m_lapData.${carIndex}.m_currentLapInvalid`
+      ),
+      name: getClosestValue(
+        data,
+        indexes.participants.timestampGroup,
+        indexes.participants.index,
+        'participants',
+        `m_participants.${carIndex}.m_name`
+      ),
+      team:
+        TEAMS[
+          getClosestValue(
+            data,
+            indexes.participants.timestampGroup,
+            indexes.participants.index,
+            'participants',
+            `m_participants.${carIndex}.m_teamId`
+          )
+        ].name,
+      driver:
+        DRIVERS[
+          getClosestValue(
+            data,
+            indexes.participants.timestampGroup,
+            indexes.participants.index,
+            'participants',
+            `m_participants.${carIndex}.m_driverId`
+          )
+        ],
+      circuit:
+        TRACKS[
+          getClosestValue(
+            data,
+            indexes.session.timestampGroup,
+            indexes.session.index,
+            'session',
+            'm_trackId'
+          )
+        ].name,
+      weather:
+        WEATHER[
+          getClosestValue(
+            data,
+            indexes.session.timestampGroup,
+            indexes.session.index,
+            'session',
+            'm_weather'
+          )
+        ]
+    };
+  }
+
   getLaps() {
-    const laps = [];
+    const laps = Array(20)
+      .fill(null)
+      .reduce(
+        (o, key, index) => ({
+          ...o,
+          [index]: { cursor: { lapNumber: null, startTime: null }, laps: [] }
+        }),
+        {}
+      );
 
-    const lapData = _.get(this.data, ['data', 'lapData'], {});
-
-    let currentLapNum = null;
-    let currentLapStart = null;
+    const data = _.get(this.data, ['data'], {});
+    const lapData = _.get(data, ['lapData'], {});
 
     Object.keys(lapData).forEach((timestampGroup, timestampGroupIndex) => {
       const timestamps = lapData[timestampGroup].times;
       timestamps.forEach((timestamp, timestampIndex) => {
-        const timestampLapNum =
-          lapData[timestampGroup]['m_lapData.0.m_currentLapNum'][
-            timestampIndex
-          ];
+        const currentIndexes = getClosestIndexes(data, timestamp);
+        Object.keys(laps).forEach(carIndex => {
+          const car = laps[carIndex];
 
-        if (!currentLapNum) {
-          currentLapNum = timestampLapNum;
-        }
+          const lapNumber = getClosestValue(
+            data,
+            currentIndexes.lapData.timestampGroup,
+            currentIndexes.lapData.index,
+            'lapData',
+            `m_lapData.${carIndex}.m_currentLapNum`
+          );
 
-        if (!currentLapStart) {
-          currentLapStart = timestamp;
-        }
+          if (!car.cursor.startTime) {
+            car.cursor.startTime = timestamp;
+          }
 
-        if (timestampLapNum !== currentLapNum) {
-          const lap = {
-            id: uuid(),
-            sessionId: this.id,
-            startTime: currentLapStart,
-            number: currentLapNum,
-            endTime: timestamps[timestampIndex - 1],
-            lapTime:
-              lapData[timestampGroup]['m_lapData.0.m_lastLapTime'][
-                timestampIndex
-              ],
-            sector1Time:
-              lapData[timestampGroup]['m_lapData.0.m_sector1Time'][
-                timestampIndex - 1
-              ],
-            sector2Time:
-              lapData[timestampGroup]['m_lapData.0.m_sector2Time'][
-                timestampIndex - 1
-              ],
-            isValid: !lapData[timestampGroup][
-              'm_lapData.0.m_currentLapInvalid'
-            ][timestampIndex - 1],
-            isFullLap: true,
-            circuit:
-              TRACKS[
-                getClosestValue(
-                  this.data.data,
-                  timestamps[timestampIndex - 1],
-                  'session',
-                  'm_trackId'
-                )
-              ].name,
-            name: getClosestValue(
-              this.data.data,
-              timestamps[timestampIndex - 1],
-              'participants',
-              'm_participants.0.m_name'
-            ),
-            team:
-              TEAMS[
-                getClosestValue(
-                  this.data.data,
-                  timestamps[timestampIndex - 1],
-                  'participants',
-                  'm_participants.0.m_teamId'
-                )
-              ].name,
-            driver:
-              DRIVERS[
-                getClosestValue(
-                  this.data.data,
-                  timestamps[timestampIndex - 1],
-                  'participants',
-                  'm_participants.0.m_driverId'
-                )
-              ],
-            weather:
-              WEATHER[
-                getClosestValue(
-                  this.data.data,
-                  timestamps[timestampIndex - 1],
-                  'session',
-                  'm_weather'
-                )
-              ]
-          };
+          if (!car.cursor.lapNumber) {
+            car.cursor.lapNumber = lapNumber;
+          }
 
-          laps.push(lap);
+          if (car.cursor.lapNumber !== lapNumber) {
+            // We have just completed a lap
+            const lapCompleteTimestamp = timestamps[timestampIndex - 1];
+            const previousIndexes = getClosestIndexes(
+              data,
+              lapCompleteTimestamp
+            );
 
-          currentLapStart = timestamp;
-          currentLapNum = timestampLapNum;
-        }
+            let lap = this.getLapInfo(
+              data,
+              carIndex,
+              previousIndexes,
+              car.cursor.startTime,
+              lapCompleteTimestamp
+            );
 
-        if (
-          timestampIndex + 1 === timestamps.length &&
-          timestampGroupIndex + 1 === Object.keys(lapData).length
-        ) {
-          const lap = {
-            id: uuid(),
-            sessionId: this.id,
-            startTime: currentLapStart,
-            number: currentLapNum,
-            endTime: timestamps[timestampIndex],
-            lapTime: timestamps[timestampIndex] - currentLapStart,
-            sector1Time:
-              lapData[timestampGroup]['m_lapData.0.m_sector1Time'][
-                timestampIndex
-              ],
-            sector2Time:
-              lapData[timestampGroup]['m_lapData.0.m_sector2Time'][
-                timestampIndex
-              ],
-            isValid: !lapData[timestampGroup][
-              'm_lapData.0.m_currentLapInvalid'
-            ][timestampIndex],
-            isFullLap: false,
-            circuit:
-              TRACKS[
-                getClosestValue(
-                  this.data.data,
-                  timestamps[timestampIndex],
-                  'session',
-                  'm_trackId'
-                )
-              ].name,
-            name: getClosestValue(
-              this.data.data,
-              timestamps[timestampIndex],
-              'participants',
-              'm_participants.0.m_name'
-            ),
-            team:
-              TEAMS[
-                getClosestValue(
-                  this.data.data,
-                  timestamps[timestampIndex],
-                  'participants',
-                  'm_participants.0.m_teamId'
-                )
-              ].name,
-            driver:
-              DRIVERS[
-                getClosestValue(
-                  this.data.data,
-                  timestamps[timestampIndex],
-                  'participants',
-                  'm_participants.0.m_driverId'
-                )
-              ],
-            weather:
-              WEATHER[
-                getClosestValue(
-                  this.data.data,
-                  timestamps[timestampIndex],
-                  'session',
-                  'm_weather'
-                )
-              ]
-          };
+            lap = {
+              ...lap,
+              isFullLap: true,
+              calculatedLapTime: lapCompleteTimestamp - car.cursor.startTime,
+              lapTime: getClosestValue(
+                data,
+                currentIndexes.lapData.timestampGroup,
+                currentIndexes.lapData.index,
+                'lapData',
+                `m_lapData.${carIndex}.m_lastLapTime`
+              )
+            };
 
-          laps.push(lap);
-        }
+            car.laps.push(lap);
+            store.dispatch(addLap(this.id, lap.id, lap));
+
+            car.cursor.lapNumber = lapNumber;
+            car.cursor.startTime = timestamp;
+          }
+
+          if (
+            timestampGroupIndex + 1 === Object.keys(lapData).length &&
+            timestampIndex + 1 === timestamps.length
+          ) {
+            let lap = this.getLapInfo(
+              data,
+              carIndex,
+              currentIndexes,
+              car.cursor.startTime,
+              timestamp
+            );
+
+            lap = {
+              ...lap,
+              isFullLap: false,
+              calculatedLapTime: timestamp - car.cursor.startTime,
+              sector1Time: lap.sector1Time !== 0 ? lap.sector1Time : null,
+              sector2Time: lap.sector2Time !== 0 ? lap.sector2Time : null
+            };
+
+            car.laps.push(lap);
+            store.dispatch(addLap(this.id, lap.id, lap));
+          }
+        });
       });
-    });
-
-    laps.forEach(lap => {
-      const lapConfig = {
-        ...lap,
-        sector1Time: lap.sector1Time !== 0 ? lap.sector1Time : null,
-        sector2Time: lap.sector2Time !== 0 ? lap.sector2Time : null
-      };
-
-      console.log(lapConfig);
-
-      store.dispatch(addLap(this.id, lap.id, lapConfig));
     });
     console.log(laps);
   }
@@ -584,32 +563,6 @@ class DataModel {
     console.log('exporting laps: ', duration);
   }
 }
-
-const getSimplifiedPoints = points => {
-  let simplifiedPoints = points;
-  const thresholds = [
-    0.1,
-    0.2,
-    0.3,
-    0.5,
-    0.75,
-    1.0,
-    1.25,
-    1.5,
-    2,
-    2.5,
-    3,
-    4,
-    5
-  ];
-
-  while (simplifiedPoints.length > 500 || thresholds.length === 0) {
-    const threshold = thresholds.shift();
-    simplifiedPoints = simplifyPoints(points, threshold, true);
-  }
-
-  return simplifiedPoints;
-};
 
 const dataModel = new DataModel();
 

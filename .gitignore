@@ -51,5 +51,5 @@ main.js.map
 npm-debug.log.*
 
 # exported sessions
-DATA/
+EXPORT_DATA/
 #*.etx

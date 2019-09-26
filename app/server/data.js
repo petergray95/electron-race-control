@@ -66,7 +66,7 @@ class BaseDataSession {
     this.participants = this.getParticipants();
     this.laps = this.getLaps();
     const storeConfig = this.getStoreConfig();
-    console.log(storeConfig);
+
     store.dispatch(updateSession(this.id, storeConfig));
   }
 
@@ -104,7 +104,6 @@ class BaseDataSession {
   }
 
   getDriver(data, timestampGroup, index, participantId) {
-    console.log(this);
     const driver =
       DRIVERS[
         getClosestValue(
@@ -115,9 +114,12 @@ class BaseDataSession {
           `m_participants.${participantId}.m_driverId`
         )
       ];
-    return driver !== null
-      ? driver
-      : { abbreviation: '', firstName: '', lastName: '' };
+
+    if (driver) {
+      return driver
+    }
+
+    return { abbreviation: '', firstName: '', lastName: '' }
   }
 
   getParticipants() {

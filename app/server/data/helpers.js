@@ -15,6 +15,8 @@ export const getTimestampGroupRange = (start, end) => {
   );
 };
 
+export const getTimestampGroups = (data, group) => Object.keys(data[group]);
+
 export const getClosestTimestamp = (timestamps, timestamp) =>
   timestamps.reduce((prev, curr) =>
     Math.abs(curr - timestamp) < Math.abs(prev - timestamp) ? curr : prev

@@ -7,6 +7,7 @@ import {
   REMOVE_SESSION
 } from '../actions/sessions';
 import { ADD_LAP } from '../actions/laps';
+import { ADD_PARTICIPANT } from '../actions/participants';
 
 import type { Action } from './types';
 
@@ -25,13 +26,33 @@ function addLap(state, action) {
   };
 }
 
+function addParticipant(state, action) {
+  const { payload } = action;
+  const { sessionId, participantId } = payload;
+
+  const session = state[sessionId];
+
+  return {
+    ...state,
+    [sessionId]: {
+      ...session,
+      participants: session.participants.concat(participantId)
+    }
+  };
+}
+
 function sessionsById(state = {}, action: Action) {
   switch (action.type) {
     case ADD_LAP:
       return addLap(state, action);
+    case ADD_PARTICIPANT:
+      return addParticipant(state, action);
     case ADD_SESSION: {
       const { sessionId, sessionConfig } = action.payload;
-      return { ...state, [sessionId]: { ...sessionConfig, laps: [] } };
+      return {
+        ...state,
+        [sessionId]: { ...sessionConfig, laps: [], participants: [] }
+      };
     }
     case UPDATE_SESSION: {
       const { sessionId, sessionConfig } = action.payload;

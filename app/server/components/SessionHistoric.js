@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Button, Grid, Header, Form, Segment } from 'semantic-ui-react';
 import { ipcRenderer } from 'electron-better-ipc';
 import ipcConstants from '../../../shared/constants/ipc-channels';
-import LapsTablePage from '../containers/LapsTablePage';
+import TimingFullPage from '../containers/TimingFullPage';
 
 import styles from './Session.css';
 
@@ -76,7 +76,7 @@ export default class SessionHistoric extends Component<Props> {
           <Header as="h3" inverted>
             Laps
           </Header>
-          <LapsTablePage sessionId={session.sessionId} />
+          <TimingFullPage sessionId={session.sessionId} />
         </Segment>
       </div>
     );

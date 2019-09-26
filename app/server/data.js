@@ -6,6 +6,7 @@ import { flatten } from 'flat';
 import { F1TelemetryClient, constants } from 'f1-telemetry-client';
 import {
   getTimestampGroup,
+  getTimestampGroups,
   getTimestampGroupRange,
   getClosestIndexes,
   getClosestValue,
@@ -18,6 +19,7 @@ import {
   removeSession
 } from '../../shared/actions/sessions';
 import { addLap } from '../../shared/actions/laps';
+import { addParticipant } from '../../shared/actions/participants';
 import { updateCursor } from '../../shared/actions/cursor';
 import store from './store';
 
@@ -32,6 +34,11 @@ class BaseDataSession {
     this.color = '#f44336';
     this.sessionType = 'base';
     this.isRunning = false;
+
+    // Session info
+    this.laps = {};
+    this.participants = {};
+    this.details = {};
   }
 
   getStoreConfig() {
@@ -40,7 +47,8 @@ class BaseDataSession {
       name: this.name,
       sessionType: this.sessionType,
       color: this.color,
-      isRunning: this.isRunning
+      isRunning: this.isRunning,
+      details: this.details
     };
   }
 
@@ -54,13 +62,144 @@ class BaseDataSession {
 
   setData(data) {
     this.data = data;
-    this.getLaps();
+    this.details = this.getDetails();
+    this.participants = this.getParticipants();
+    this.laps = this.getLaps();
+    const storeConfig = this.getStoreConfig();
+    console.log(storeConfig);
+    store.dispatch(updateSession(this.id, storeConfig));
+  }
+
+  getDetails() {
+    const data = _.get(this.data, ['data'], {});
+    const timestampGroups = getTimestampGroups(data, 'session');
+    const lastTimestampGroup = timestampGroups[
+      timestampGroups.length - 1
+    ].replace('_', '');
+
+    const sessionTimes = data.session[`_${lastTimestampGroup}`].times;
+
+    return {
+      track:
+        TRACKS[
+          getClosestValue(
+            data,
+            lastTimestampGroup,
+            sessionTimes.length - 1,
+            'session',
+            `m_trackId`
+          )
+        ],
+      weather:
+        WEATHER[
+          getClosestValue(
+            data,
+            lastTimestampGroup,
+            sessionTimes.length - 1,
+            'session',
+            `m_weather`
+          )
+        ]
+    };
+  }
+
+  getDriver(data, timestampGroup, index, participantId) {
+    console.log(this);
+    const driver =
+      DRIVERS[
+        getClosestValue(
+          data,
+          timestampGroup,
+          index,
+          'participants',
+          `m_participants.${participantId}.m_driverId`
+        )
+      ];
+    return driver !== null
+      ? driver
+      : { abbreviation: '', firstName: '', lastName: '' };
+  }
+
+  getParticipants() {
+    const data = _.get(this.data, ['data'], {});
+    const timestampGroups = getTimestampGroups(data, 'participants');
+    const lastTimestampGroup = timestampGroups[
+      timestampGroups.length - 1
+    ].replace('_', '');
+
+    const participantTimes = data.participants[`_${lastTimestampGroup}`].times;
+
+    const participants = Array(20)
+      .fill(null)
+      .reduce(
+        (o, key, index) => ({
+          ...o,
+          [index]: {
+            id: uuid(),
+            carIndex: index,
+            sessionId: this.id,
+            driver: null,
+            name: null,
+            nationality: null,
+            raceNumber: null,
+            team: null
+          }
+        }),
+        {}
+      );
+
+    Object.keys(participants).forEach(participantId => {
+      const participant = participants[participantId];
+      participant.driver = this.getDriver(
+        data,
+        lastTimestampGroup,
+        participantTimes.length - 1,
+        participantId
+      );
+      participant.name = getClosestValue(
+        data,
+        lastTimestampGroup,
+        participantTimes.length - 1,
+        'participants',
+        `m_participants.${participantId}.m_name`
+      );
+      participant.nationality = getClosestValue(
+        data,
+        lastTimestampGroup,
+        participantTimes.length - 1,
+        'participants',
+        `m_participants.${participantId}.m_nationality`
+      );
+      participant.raceNumber = getClosestValue(
+        data,
+        lastTimestampGroup,
+        participantTimes.length - 1,
+        'participants',
+        `m_participants.${participantId}.m_raceNumber`
+      );
+      participant.team =
+        TEAMS[
+          getClosestValue(
+            data,
+            lastTimestampGroup,
+            participantTimes.length - 1,
+            'participants',
+            `m_participants.${participantId}.m_teamId`
+          )
+        ];
+
+      store.dispatch(addParticipant(this.id, participant.id, participant));
+    });
+    return participants;
   }
 
   getLapInfo(data, carIndex, indexes, startTime, endTime) {
+    const participantId = this.participants[carIndex].id;
+
     return {
       id: uuid(),
       sessionId: this.id,
+      participantId,
       carId: carIndex,
       startTime,
       endTime,
@@ -94,54 +233,7 @@ class BaseDataSession {
         indexes.lapData.index,
         'lapData',
         `m_lapData.${carIndex}.m_currentLapInvalid`
-      ),
-      name: getClosestValue(
-        data,
-        indexes.participants.timestampGroup,
-        indexes.participants.index,
-        'participants',
-        `m_participants.${carIndex}.m_name`
-      ),
-      team:
-        TEAMS[
-          getClosestValue(
-            data,
-            indexes.participants.timestampGroup,
-            indexes.participants.index,
-            'participants',
-            `m_participants.${carIndex}.m_teamId`
-          )
-        ].name,
-      driver:
-        DRIVERS[
-          getClosestValue(
-            data,
-            indexes.participants.timestampGroup,
-            indexes.participants.index,
-            'participants',
-            `m_participants.${carIndex}.m_driverId`
-          )
-        ],
-      circuit:
-        TRACKS[
-          getClosestValue(
-            data,
-            indexes.session.timestampGroup,
-            indexes.session.index,
-            'session',
-            'm_trackId'
-          )
-        ].name,
-      weather:
-        WEATHER[
-          getClosestValue(
-            data,
-            indexes.session.timestampGroup,
-            indexes.session.index,
-            'session',
-            'm_weather'
-          )
-        ]
+      )
     };
   }
 
@@ -201,7 +293,8 @@ class BaseDataSession {
             lap = {
               ...lap,
               isFullLap: true,
-              calculatedLapTime: lapCompleteTimestamp - car.cursor.startTime,
+              calculatedLapTime:
+                (lapCompleteTimestamp - car.cursor.startTime) / 1000,
               lapTime: getClosestValue(
                 data,
                 currentIndexes.lapData.timestampGroup,
@@ -246,7 +339,7 @@ class BaseDataSession {
         });
       });
     });
-    console.log(laps);
+    return laps;
   }
 
   loadData(filepath) {
@@ -510,6 +603,7 @@ class DataModel {
       const output = {
         session: session.getStoreConfig(),
         lap,
+        participant: session.participants[lap.carIndex],
         data: {}
       };
 
@@ -561,7 +655,7 @@ class DataModel {
       });
 
       fs.writeFile(
-        `./DATA/${session.name}_${lap.number}.json`,
+        `./EXPORT_DATA/${session.name}_${lap.number}.json`,
         JSON.stringify(output),
         'utf8',
         () => {}

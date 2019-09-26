@@ -10,6 +10,7 @@ import ipcConstants from '../../../shared/constants/ipc-channels';
 import styles from './LapsTable.css';
 
 type Props = {
+  carId: number,
   laps: object
 };
 
@@ -36,9 +37,8 @@ export default class LapsTable extends Component<Props> {
 
   isLapSelected = id => _.get(this.state, ['selections', id], false);
 
-  renderLaps(allLaps) {
-    const laps = allLaps.filter(lap => Number(lap.carId) === 0);
-    console.log(laps);
+  renderLaps(carId, allLaps) {
+    const laps = allLaps.filter(lap => lap.carId === carId);
     const validLaps = laps.filter(lap => lap.isValid && lap.isFullLap);
     const purpleSectors = {
       sector1: Math.min(...validLaps.map(lap => lap.sector1Time)),
@@ -123,7 +123,7 @@ export default class LapsTable extends Component<Props> {
   };
 
   render = () => {
-    const { laps } = this.props;
+    const { carId, laps } = this.props;
     const { selections } = this.state;
     return (
       <Table inverted selectable textAlign="center">
@@ -139,7 +139,7 @@ export default class LapsTable extends Component<Props> {
             <Table.HeaderCell>Export</Table.HeaderCell>
           </Table.Row>
         </Table.Header>
-        <Table.Body>{this.renderLaps(laps)}</Table.Body>
+        <Table.Body>{this.renderLaps(carId, laps)}</Table.Body>
         <Table.Footer fullWidth>
           <Table.Row>
             <Table.HeaderCell colSpan="8">

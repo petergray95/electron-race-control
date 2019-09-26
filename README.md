@@ -1,4 +1,4 @@
-## Sim Race Hub (SRH)
+## eSports Racing Hub (eRH)
 
 ### Data Structure
 

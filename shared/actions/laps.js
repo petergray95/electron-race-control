@@ -4,13 +4,7 @@
 export const ADD_LAP = 'ADD_LAP';
 export const REMOVE_LAP = 'REMOVE_LAP';
 
-export function addLap(sessionId, lapId, lapConfig) {
-  const lap = {
-    ...lapConfig,
-    sector3Time:
-      lapConfig.lapTime - lapConfig.sector2Time - lapConfig.sector1Time
-  };
-
+export function addLap(sessionId, lapId, lap) {
   return {
     type: ADD_LAP,
     payload: { sessionId, lapId, lap }

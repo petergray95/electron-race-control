@@ -95,6 +95,11 @@ export default class LapsTable extends Component<Props> {
           )}
         </Table.Cell>
         <Table.Cell>
+          <Moment unix format="HH.mm.ss">
+            {lap.endTime/1000}
+          </Moment>
+        </Table.Cell>
+        <Table.Cell>
           {lap.isValid && <Icon color="green" name="checkmark" size="large" />}
         </Table.Cell>
         <Table.Cell>
@@ -134,6 +139,7 @@ export default class LapsTable extends Component<Props> {
             <Table.HeaderCell>S2</Table.HeaderCell>
             <Table.HeaderCell>S3</Table.HeaderCell>
             <Table.HeaderCell>Time</Table.HeaderCell>
+            <Table.HeaderCell>ToD</Table.HeaderCell>
             <Table.HeaderCell>Valid</Table.HeaderCell>
             <Table.HeaderCell>Complete</Table.HeaderCell>
             <Table.HeaderCell>Export</Table.HeaderCell>
@@ -142,7 +148,7 @@ export default class LapsTable extends Component<Props> {
         <Table.Body>{this.renderLaps(carId, laps)}</Table.Body>
         <Table.Footer fullWidth>
           <Table.Row>
-            <Table.HeaderCell colSpan="8">
+            <Table.HeaderCell colSpan="9">
               <Button
                 floated="right"
                 icon

@@ -37,6 +37,6 @@ export default class TimingFull extends Component<Props> {
       tabs.push(tab);
     });
 
-    return <Tab menu={{ inverted: true, secondary: true }} panes={tabs} />;
+    return <Tab menu={{ inverted: true, secondary: true, pagination: true }} panes={tabs} />;
   }
 }

@@ -195,10 +195,10 @@ class BaseDataSession {
     return participants;
   }
 
-  getLapInfo(data, carIndex, indexes, startTime, endTime) {
+  getLapInfo(data, carIndex, indexes, startTime, endTime, lapTime=null) {
     const participantId = this.participants[carIndex].id;
 
-    return {
+    let lap = {
       id: uuid(),
       sessionId: this.id,
       participantId,
@@ -213,7 +213,7 @@ class BaseDataSession {
         `m_lapData.${carIndex}.m_currentLapNum`
       ),
       calculatedLapTime: null,
-      lapTime: null,
+      lapTime,
       isFullLap: null,
       sector1Time: getClosestValue(
         data,
@@ -237,6 +237,19 @@ class BaseDataSession {
         `m_lapData.${carIndex}.m_currentLapInvalid`
       )
     };
+
+    lap = {
+      ...lap,
+      sector1Time: lap.sector1Time !== 0 ? lap.sector1Time : null,
+      sector2Time: lap.sector2Time !== 0 ? lap.sector2Time : null
+    };
+
+    lap = {
+      ...lap,
+      sector3Time: lap.lapTime && lap.sector1Time && lap.sector2Time ? (lap.lapTime-lap.sector2Time-lap.sector1Time) : null
+    };
+
+    return lap
   }
 
   getLaps() {
@@ -289,21 +302,21 @@ class BaseDataSession {
               carIndex,
               previousIndexes,
               car.cursor.startTime,
-              lapCompleteTimestamp
-            );
-
-            lap = {
-              ...lap,
-              isFullLap: true,
-              calculatedLapTime:
-                (lapCompleteTimestamp - car.cursor.startTime) / 1000,
-              lapTime: getClosestValue(
+              lapCompleteTimestamp,
+              getClosestValue(
                 data,
                 currentIndexes.lapData.timestampGroup,
                 currentIndexes.lapData.index,
                 'lapData',
                 `m_lapData.${carIndex}.m_lastLapTime`
               )
+            );
+
+            lap = {
+              ...lap,
+              isFullLap: true,
+              calculatedLapTime:
+                (lapCompleteTimestamp - car.cursor.startTime) / 1000
             };
 
             car.laps.push(lap);
@@ -329,10 +342,7 @@ class BaseDataSession {
             lap = {
               ...lap,
               isFullLap: false,
-              calculatedLapTime: timestamp - car.cursor.startTime,
-              sector1Time: lap.sector1Time !== 0 ? lap.sector1Time : null,
-              sector2Time: lap.sector2Time !== 0 ? lap.sector2Time : null,
-              sector3Time: lap.sector3Time !== 0 ? lap.sector3Time : null
+              calculatedLapTime: timestamp - car.cursor.startTime
             };
 
             car.laps.push(lap);
@@ -605,7 +615,7 @@ class DataModel {
       const output = {
         session: session.getStoreConfig(),
         lap,
-        participant: session.participants[lap.carIndex],
+        participant: session.participants[lap.carId],
         data: {}
       };
 
@@ -662,6 +672,9 @@ class DataModel {
         'utf8',
         () => {}
       );
+
+      console.log(output.participant);
+      console.log(JSON.stringify(output.participant));
     });
 
     const duration = performance.now() - start;

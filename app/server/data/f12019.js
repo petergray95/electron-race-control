@@ -13,9 +13,26 @@ import {
   getSimplifiedPoints
 } from './helpers';
 
+const { DRIVERS, PACKETS, TEAMS, TRACKS, TYRES, WEATHER } = constants;
 
-const { DRIVERS, PACKETS, TEAMS, TRACKS, WEATHER } = constants;
+const getDriver = (data, timestampGroup, index, participantId) => {
+  const driver =
+    DRIVERS[
+      getClosestValue(
+        data,
+        timestampGroup,
+        index,
+        'participants',
+        `m_participants.${participantId}.m_driverId`
+      )
+    ];
 
+  if (driver) {
+    return driver;
+  }
+
+  return { abbreviation: '', firstName: '', lastName: '' };
+};
 
 export class F12019SessionLive extends BaseDataSessionLive {
   constructor(opts) {
@@ -144,25 +161,6 @@ export class F12019SessionHistoric extends BaseDataSessionHistoric {
     };
   }
 
-  getDriver(data, timestampGroup, index, participantId) {
-    const driver =
-      DRIVERS[
-        getClosestValue(
-          data,
-          timestampGroup,
-          index,
-          'participants',
-          `m_participants.${participantId}.m_driverId`
-        )
-      ];
-
-    if (driver) {
-      return driver
-    }
-
-    return { abbreviation: '', firstName: '', lastName: '' }
-  }
-
   getParticipants() {
     const data = _.get(this.data, ['data'], {});
     const timestampGroups = getTimestampGroups(data, 'participants');
@@ -188,7 +186,7 @@ export class F12019SessionHistoric extends BaseDataSessionHistoric {
         team: null
       };
 
-      participant.driver = this.getDriver(
+      participant.driver = getDriver(
         data,
         lastTimestampGroup,
         participantTimes.length - 1,
@@ -228,11 +226,10 @@ export class F12019SessionHistoric extends BaseDataSessionHistoric {
 
       participants[carId] = participant;
     });
-    return participants
+    return participants;
   }
 
-  getLapInfo(data, carId, indexes, startTime, endTime, lapTime=null) {
-    console.log(this.participants, carId);
+  getLapInfo(data, carId, indexes, startTime, endTime, lapTime = null) {
     const participantId = this.participants[carId].id;
 
     let lap = {
@@ -272,7 +269,37 @@ export class F12019SessionHistoric extends BaseDataSessionHistoric {
         indexes.lapData.index,
         'lapData',
         `m_lapData.${carId}.m_currentLapInvalid`
-      )
+      ),
+      fuelInTank: getClosestValue(
+        data,
+        indexes.carStatus.timestampGroup,
+        indexes.carStatus.index,
+        'carStatus',
+        `m_carStatusData.${carId}.m_fuelInTank`
+      ),
+      tyreCompound:
+        TYRES[
+          getClosestValue(
+            data,
+            indexes.carStatus.timestampGroup,
+            indexes.carStatus.index,
+            'carStatus',
+            `m_carStatusData.${carId}.m_actualTyreCompound`
+          )
+        ],
+      tyreAllocatedCompound:
+        TYRES[
+          getClosestValue(
+            data,
+            indexes.carStatus.timestampGroup,
+            indexes.carStatus.index,
+            'carStatus',
+            `m_carStatusData.${carId}.m_tyreVisualCompound`
+          )
+        ],
+      sector1SpeedTrap: null,
+      sector2SpeedTrap: null,
+      sector3SpeedTrap: null
     };
 
     lap = {
@@ -283,10 +310,55 @@ export class F12019SessionHistoric extends BaseDataSessionHistoric {
 
     lap = {
       ...lap,
-      sector3Time: lap.lapTime && lap.sector1Time && lap.sector2Time ? (lap.lapTime-lap.sector2Time-lap.sector1Time) : null
+      sector3Time:
+        lap.lapTime && lap.sector1Time && lap.sector2Time
+          ? lap.lapTime - lap.sector2Time - lap.sector1Time
+          : null
     };
 
-    return lap
+    // get speed trap info
+    if (lap.sector1Time) {
+      const sectorIndexes = getClosestIndexes(
+        data,
+        lap.startTime + lap.sector1Time * 1000
+      );
+      console.log(lap.sector1Time, sectorIndexes);
+      lap.sector1SpeedTrap = getClosestValue(
+        data,
+        sectorIndexes.carTelemetry.timestampGroup,
+        sectorIndexes.carTelemetry.index,
+        'carTelemetry',
+        `m_carTelemetryData.${carId}.m_speed`
+      );
+      console.log(lap);
+    }
+
+    if (lap.sector2Time) {
+      const sectorIndexes = getClosestIndexes(
+        data,
+        lap.startTime + lap.sector1Time * 1000 + lap.sector2Time * 1000
+      );
+      lap.sector2SpeedTrap = getClosestValue(
+        data,
+        sectorIndexes.carTelemetry.timestampGroup,
+        sectorIndexes.carTelemetry.index,
+        'carTelemetry',
+        `m_carTelemetryData.${carId}.m_speed`
+      );
+    }
+
+    if (lap.sector3Time) {
+      const sectorIndexes = getClosestIndexes(data, lap.endTime);
+      lap.sector3SpeedTrap = getClosestValue(
+        data,
+        sectorIndexes.carTelemetry.timestampGroup,
+        sectorIndexes.carTelemetry.index,
+        'carTelemetry',
+        `m_carTelemetryData.${carId}.m_speed`
+      );
+    }
+
+    return lap;
   }
 
   getLaps() {
@@ -394,7 +466,7 @@ export class F12019SessionHistoric extends BaseDataSessionHistoric {
       });
     });
     return laps;
-  };
+  }
 
   exportLap(carId: string, lapId: string, simplify: boolean = true) {
     const lap = this.getLap(carId, lapId);
@@ -456,9 +528,7 @@ export class F12019SessionHistoric extends BaseDataSessionHistoric {
         });
       });
 
-      output.data[key] = simplify
-        ? getSimplifiedPoints(dataArray)
-        : dataArray;
+      output.data[key] = simplify ? getSimplifiedPoints(dataArray) : dataArray;
     });
 
     fs.writeFile(

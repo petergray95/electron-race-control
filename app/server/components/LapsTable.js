@@ -41,14 +41,17 @@ export default class LapsTable extends Component<Props> {
     const laps = allLaps.filter(lap => lap.carId === carId);
     const validLaps = laps.filter(lap => lap.isValid && lap.isFullLap);
     const purpleSectors = {
-      sector1: Math.min(...validLaps.map(lap => lap.sector1Time)),
-      sector2: Math.min(...validLaps.map(lap => lap.sector2Time)),
-      sector3: Math.min(...validLaps.map(lap => lap.sector3Time)),
-      lapTime: Math.min(...validLaps.map(lap => lap.lapTime))
+      sector1Time: Math.min(...validLaps.map(lap => lap.sector1Time)),
+      sector2Time: Math.min(...validLaps.map(lap => lap.sector2Time)),
+      sector3Time: Math.min(...validLaps.map(lap => lap.sector3Time)),
+      lapTime: Math.min(...validLaps.map(lap => lap.lapTime)),
+      sector1SpeedTrap: Math.max(...validLaps.map(lap => lap.sector1SpeedTrap)),
+      sector2SpeedTrap: Math.max(...validLaps.map(lap => lap.sector2SpeedTrap)),
+      sector3SpeedTrap: Math.max(...validLaps.map(lap => lap.sector3SpeedTrap))
     };
 
     return laps.map(lap => (
-      <Table.Row disabled={!lap.isFullLap} key={lap.id}>
+      <Table.Row disabled={!lap.isFullLap || !lap.isValid} key={lap.id}>
         <Table.Cell>{lap.number}</Table.Cell>
         <Table.Cell style={{ color: lap.tyreCompound.color }}>
           {lap.tyreCompound.name}
@@ -67,7 +70,9 @@ export default class LapsTable extends Component<Props> {
         </Table.Cell>
         <Table.Cell
           className={
-            lap.sector1Time === purpleSectors.sector1 ? styles.fastest : null
+            lap.sector1Time === purpleSectors.sector1Time
+              ? styles.fastest
+              : null
           }
         >
           {lap.sector1Time && (
@@ -76,10 +81,20 @@ export default class LapsTable extends Component<Props> {
             </Moment>
           )}
         </Table.Cell>
-        <Table.Cell>{lap.sector1SpeedTrap}</Table.Cell>
         <Table.Cell
           className={
-            lap.sector2Time === purpleSectors.sector2 ? styles.fastest : null
+            lap.sector1SpeedTrap === purpleSectors.sector1SpeedTrap
+              ? styles.fastest
+              : null
+          }
+        >
+          {lap.sector1SpeedTrap}
+        </Table.Cell>
+        <Table.Cell
+          className={
+            lap.sector2Time === purpleSectors.sector2Time
+              ? styles.fastest
+              : null
           }
         >
           {lap.sector2Time && (
@@ -88,10 +103,20 @@ export default class LapsTable extends Component<Props> {
             </Moment>
           )}
         </Table.Cell>
-        <Table.Cell>{lap.sector2SpeedTrap}</Table.Cell>
         <Table.Cell
           className={
-            lap.sector3Time === purpleSectors.sector3 ? styles.fastest : null
+            lap.sector2SpeedTrap === purpleSectors.sector2SpeedTrap
+              ? styles.fastest
+              : null
+          }
+        >
+          {lap.sector2SpeedTrap}
+        </Table.Cell>
+        <Table.Cell
+          className={
+            lap.sector3Time === purpleSectors.sector3Time
+              ? styles.fastest
+              : null
           }
         >
           {lap.sector3Time && (
@@ -100,7 +125,15 @@ export default class LapsTable extends Component<Props> {
             </Moment>
           )}
         </Table.Cell>
-        <Table.Cell>{lap.sector3SpeedTrap}</Table.Cell>
+        <Table.Cell
+          className={
+            lap.sector3SpeedTrap === purpleSectors.sector3SpeedTrap
+              ? styles.fastest
+              : null
+          }
+        >
+          {lap.sector3SpeedTrap}
+        </Table.Cell>
         <Table.Cell>
           <Moment unix format="HH.mm.ss">
             {lap.endTime / 1000}

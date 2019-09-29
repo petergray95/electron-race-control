@@ -64,6 +64,10 @@ export class BaseDataSession {
     throw new Error('session exportLap not implemented');
   }
 
+  getLap(carId, lapId) {
+    return this.laps[carId][lapId];
+  }
+
   exportLaps(laps) {
     laps.forEach(lap => {
       this.exportLap(lap);
@@ -75,11 +79,11 @@ export class BaseDataSession {
     this.participants[participant.carId] = participant;
   };
 
-  addLap(carId, lap) {
-    this.participants[carId].laps.push(lap.id);
+  addLap(carId, lapId, lap) {
+    this.participants[carId].laps.push(lapId);
 
-    store.dispatch(addLap(this.id, lap.id, lap));
-    this.laps[carId].push(lap);
+    store.dispatch(addLap(this.id, lapId, lap));
+    this.laps[carId][lapId] = lap;
   };
 
   addDetails(details) {
@@ -92,8 +96,8 @@ export class BaseDataSession {
   addLaps(laps) {
     Object.keys(laps).forEach(carId => {
       const carLaps = laps[carId];
-      carLaps.forEach(lap => {
-        this.addLap(carId, lap);
+      Object.keys(carLaps).forEach(lapId => {
+        this.addLap(carId, lapId, carLaps[lapId]);
       })
     })
   };

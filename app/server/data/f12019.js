@@ -301,7 +301,7 @@ export class F12019SessionHistoric extends BaseDataSessionHistoric {
     const laps = [...Array(20).keys()].reduce(
       (o, key) => ({
         ...o,
-        [key]: []
+        [key]: {}
       }),
       {}
     );
@@ -363,7 +363,7 @@ export class F12019SessionHistoric extends BaseDataSessionHistoric {
                 (lapCompleteTimestamp - carCursor.startTime) / 1000
             };
 
-            laps[carId].push(lap);
+            laps[carId][lap.id] = lap;
 
             carCursor.lapNumber = lapNumber;
             carCursor.startTime = timestamp;
@@ -388,7 +388,7 @@ export class F12019SessionHistoric extends BaseDataSessionHistoric {
               calculatedLapTime: timestamp - carCursor.startTime
             };
 
-            laps[carId].push(lap);
+            laps[carId][lap.id] = lap;
           }
         });
       });
@@ -397,7 +397,7 @@ export class F12019SessionHistoric extends BaseDataSessionHistoric {
   };
 
   exportLap(carId: string, lapId: string, simplify: boolean = true) {
-    const lap = this.laps[carId].filter(item => item.id === lapId)[0];
+    const lap = this.getLap(carId, lapId);
 
     const channels = [
       ['carTelemetry', 'm_carTelemetryData.0.m_speed'],
